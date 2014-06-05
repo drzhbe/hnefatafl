@@ -3,6 +3,8 @@ hnefatafl
 
 Hnefatafl, the Scandinavian board game
 
-Only single player shipped for the moment.
+Multiplayer client and server shipped for the moment.
 
-Working on multiplayer.
+Lack of single player.
+
+http://drzhbe.github.io/hnefatafl/
