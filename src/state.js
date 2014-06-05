@@ -10,6 +10,8 @@ var state = {
     king: null, // pointer to King Warrior
     active: null, // pointer to active Warrior — clicked and ready to move
     board: null,
+    socket: null, // {socket.io} current client's socket @TODO: so bad to store socket in state
+    color: null, // {String} current client's color @TODO: same here
     moves: [],
     turn: 'black' // Black starts
 };

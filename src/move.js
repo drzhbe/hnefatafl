@@ -1,54 +1,78 @@
+var hasUI = typeof window != 'undefined';
 var $ = require('jquery');
 var state = require('./state');
 var directions = require('./directions');
 
-var $infoTurn = $('.info__turn');
-var $infoWinner = $('.info__winner');
-
-function recordMove(cell) {
-    state.moves.push({
-        color: state.active.color,
-        isKing: state.active.isKing,
-        x1: state.active.x,
-        y1: state.active.y,
-        x2: cell.x,
-        y2: cell.y
-    });
+if (hasUI) {
+    var $infoTurn = $('.info__turn');
+    var $infoWinner = $('.info__winner');
 }
 
-function move(cell, direction) {
-    recordMove(cell);
-    cell.element.append( state.active.element.detach() );
-    state.active.element.removeClass('_active');
-    state.active.x = cell.x;
-    state.active.y = cell.y;
-    state.active.cell.warrior = null; // rm warrior from old cell
-    state.active.cell = cell; // set new cell to warrior
-    state.active.cell.warrior = state.active; // set warrior to new cell
+function recordMove(from, to) {
+    var move = {
+        color: from.warrior.color,
+        isKing: from.warrior.isKing,
+        x1: from.x,
+        y1: from.y,
+        x2: to.x,
+        y2: to.y
+    };
+    state.moves.push(move);
+    return move;
+}
+
+function sendMove(move) {
+    state.socket.emit('move', move);
+}
+
+/**
+ * @param {Cell} from
+ * @param {Cell} to
+ * @param {String} direction
+ * @param {Boolean} recievedMove — флаг говорит о том, что мы не приняли этот ход от оппонента
+ */
+function move(from, to, direction, recievedMove) {
+    var moveRec = recordMove(from, to);
+    if (!recievedMove) {
+        sendMove(moveRec);
+    }
+    if (hasUI) {
+        to.element.append( from.warrior.element.detach() );
+        from.warrior.element.removeClass('_active');
+    }
+    from.warrior.move(to);
     state.active = null; // rm pointer to warrior from active
 
-    if (cell.type == 'corner' && cell.warrior.isKing) {
+    if (to.type == 'corner' && to.warrior.isKing) {
         // white wins
-        $infoTurn.hide();
-        $infoWinner.addClass('_white');
-        $infoWinner.show();
+        if (hasUI) {
+            $infoTurn.hide();
+            $infoWinner.addClass('_white');
+            $infoWinner.show();
+        }
         return;
     }
 
-    eatNeighbors(cell, direction);
+    eatNeighbors(to, direction);
 
     if (!state.king) {
         // black wins
-        $infoTurn.hide();
-        $infoWinner.addClass('_black');
-        $infoWinner.show();
+        if (hasUI) {
+            $infoTurn.hide();
+            $infoWinner.addClass('_black');
+            $infoWinner.show();
+        }
         return;
     }
 
     // change turn
-    $infoTurn.removeClass('_' + state.turn);
+    if (hasUI) {
+        $infoTurn.removeClass('_' + state.turn);
+    }
     state.turn = state.turn == 'black' ? 'white' : 'black';
-    $infoTurn.addClass('_' + state.turn);
+    if (hasUI) {
+        $infoTurn.addClass('_' + state.turn);
+    }
 }
 
 // store directions outside fn will decrease access speed, but save memory → decrease GC pressure
@@ -116,16 +140,20 @@ function isPathFree(from, to, direction) {
     return true;
 }
 
-function tryToMove(cell) {
-    if (state.active && state.active.color == state.turn &&
-        (!cell.type || state.active.isKing) && !cell.warrior &&
-        (state.active.x == cell.x || state.active.y == cell.y)) {
+function tryToMove(from, to) {
+    if (state.turn == state.color && // check if it is current client's turn
+        from.warrior.color == state.turn && // check if it is warrior's turn
+        (!to.type || from.warrior.isKing) && !to.warrior &&
+        (from.x == to.x || from.y == to.y)) {
 
-        var direction = directions.get(state.active.cell, cell);
-        if (isPathFree(state.active.cell, cell, direction)) {
-            move(cell, direction);
+        var direction = directions.get(from, to);
+        if (isPathFree(from, to, direction)) {
+            move(from, to, direction);
         }
     }
 }
 
-module.exports = tryToMove;
+module.exports = {
+    tryToMove: tryToMove,
+    move: move
+};

@@ -6,26 +6,61 @@ var state = require('./state');
 function Board(size) {
     this.size = size;
     this.cells = []; // array of N=size arrays, each containing N cells
-    this.element = $('<div>').addClass('board');
+    this.element = null; // {Null|jQuery}
 }
-Board.prototype.generate = function() {
+/**
+ * Generate UI and bind events for:
+ * - a Board
+ * - all Cells
+ * - all Warriors
+ * So board generation with UI goes in 2 full for-loops.
+ */
+Board.prototype.generateUI = function() {
+    var size = this.size;
+    
+    this.element = $('<div>').addClass('board');
+    
+    for (var x = 0; x < size; x++) {
+        var cellX = this.cells[x];
+        cellX.element = $('<div>').addClass('board__line');
+        this.element.append( cellX.element );
+        for (var y = 0; y < size; y++) {
+            cellX[y].generateUI();
+            cellX.element.append( cellX[y].element );
+            if (cellX[y].warrior) {
+                cellX[y].warrior.generateUI();
+                cellX[y].element.append( cellX[y].warrior.element );
+            }
+        }
+    }
+
+    var boardWrapper = $('.boardWrapper');
+    if (!boardWrapper.length) {
+        boardWrapper = $(document.body);
+    }
+    boardWrapper.append(this.element);
+};
+/**
+ * @param {Boolean} hasUI — whether we should generate UI or not
+ */
+Board.prototype.generate = function(hasUI) {
     var size = this.size;
 
     for (var x = 0; x < size; x++) {
         this.cells.push([]);
-        this.cells[x].element = $('<div>').addClass('board__line');
-        this.element.append( this.cells[x].element );
         for (var y = 0; y < size; y++) {
             this.addCell(x, y);
         }
     }
 
-    $(document.body).append( this.element );
+    if (hasUI) {
+        this.generateUI();
+    }
 
     return this;
 };
-function addWarrior(x, y, color) {
-    var warrior = new Warrior(x, y, color);
+function addWarrior(color) {
+    var warrior = new Warrior(color);
     state.warriors[color].push( warrior );
     return warrior;
 }
@@ -52,7 +87,6 @@ Board.prototype.addCell = function(x, y) {
 
     var cell = new Cell(x, y, cellType);
     this.cells[x].push( cell );
-    this.cells[x].element.append( cell.element );
 
     var warrior;
 
@@ -60,16 +94,18 @@ Board.prototype.addCell = function(x, y) {
     if ((y == 0 || y == lastIndex) && 
         (x > 2 && x < lastIndex - 2)) {
 
-        warrior = addWarrior(x, y, 'black');
+        warrior = addWarrior('black');
     } else if ((x == 0 || x == lastIndex) &&
         (y > 2 && y < lastIndex - 2)) {
 
-        warrior = addWarrior(x, y, 'black');
+        warrior = addWarrior('black');
     } else if (x == centerIndex && (y == 1 || y == lastIndex - 1)) {
-        warrior = addWarrior(x, y, 'black');
+        warrior = addWarrior('black');
     } else if (y == centerIndex && (x == 1 || x == lastIndex - 1)) {
-        warrior = addWarrior(x, y, 'black');
+        warrior = addWarrior('black');
     }
+
+    // @TODO: following conditions should else if
 
     // Place the King and white Warriors
     /*
@@ -82,7 +118,7 @@ Board.prototype.addCell = function(x, y) {
     if (x == centerIndex &&
         y == centerIndex) {
 
-        warrior = new Warrior(x, y, 'white', true);
+        warrior = new Warrior('white', true);
         state.king = warrior;
     /*
             x
@@ -94,7 +130,7 @@ Board.prototype.addCell = function(x, y) {
     } else if (x == centerIndex &&
         (y > centerIndex - 3 && y < centerIndex + 3)) {
 
-        warrior = addWarrior(x, y, 'white');
+        warrior = addWarrior('white');
     /*
             o
           x o x
@@ -105,7 +141,7 @@ Board.prototype.addCell = function(x, y) {
     } else if (y == centerIndex &&
         (x > centerIndex - 3 && x < centerIndex + 3)) {
 
-        warrior = addWarrior(x, y, 'white');
+        warrior = addWarrior('white');
     /*
             x
           o x o
@@ -116,13 +152,12 @@ Board.prototype.addCell = function(x, y) {
     } else if ((x == centerIndex - 1 || x == centerIndex + 1) &&
         (y == centerIndex - 1 || y == centerIndex + 1)) {
 
-        warrior = addWarrior(x, y, 'white');
+        warrior = addWarrior('white');
     }
 
     if (warrior) {
         warrior.cell = cell;
         cell.warrior = warrior;
-        cell.element.append( warrior.element );
     }
 
     return this;

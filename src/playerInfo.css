@@ -1,0 +1,11 @@
+.playerInfo {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+.playerInfo__color {
+    display: none;
+}
+.playerInfo__serverPopulation {
+    display: none;
+}

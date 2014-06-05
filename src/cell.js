@@ -1,22 +1,24 @@
 var $ = require('jquery');
 var state = require('./state');
-var tryToMove = require('./move');
+var tryToMove = require('./move').tryToMove;
 
 function Cell(x, y, type) {
-    var self = this;
     this.x = x;
     this.y = y;
     this.type = type;
     this.warrior = null;
+    this.element = null; // {Null|jQuery}
+};
+Cell.prototype.generateUI = function() {
+    var self = this;
     this.element = $('<div>').addClass('board__cell');
-    if (type) {
-        this.element.addClass('_' + type);
+    if (this.type) {
+        this.element.addClass('_' + this.type);
     }
     this.element.on('click', function() {
-        tryToMove(self);
+        tryToMove(state.active.cell, self);
     });
 };
-
 Cell.prototype.top = function() {
     var topY = this.y - 1;
     if (topY >= 0) {

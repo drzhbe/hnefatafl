@@ -40,6 +40,22 @@ body {
     margin: 0;
     padding: 0;
 }
+.main {
+    width: 800px;
+    margin: 0 auto;
+    position: relative;
+}
+.playerInfo {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+.playerInfo__color {
+    display: none;
+}
+.playerInfo__serverPopulation {
+    display: none;
+}
 .warrior {
     width: 40px;
     height: 40px;

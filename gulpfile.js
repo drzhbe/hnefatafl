@@ -20,7 +20,7 @@ var paths = {
 // }
 
 gulp.task('scripts', function() {
-    return browserify('./src/main.js')
+    return browserify('./src/client.js')
         .bundle()
         .pipe(source('desktop.js'))
         .pipe(gulp.dest('./build/'));

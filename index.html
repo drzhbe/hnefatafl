@@ -9,6 +9,22 @@
         <div class='info__turn _black'>Move, <span class="info__color"></span></div>
         <div class='info__winner'>Winner — <span class="info__color"></span></div>
     </div>
+    <div class='main'>
+        <div class='boardWrapper'>
+        </div>
+        <div class='playerInfo'>
+            <!-- <div class='actions__play'>Играть</div> -->
+            <form class='actions__connect'>
+                <input class='actions__connectServer' type='text' name='server' placeholder='http://localhost:3000' />
+                <input type='submit' value='go' />
+            </form>
+            <span class='playerInfo__serverName'></span>
+            <div class='playerInfo__serverPopulation'>Популяция сервера: <span class='playerInfo__serverPopulationCount'></span></div>
+            <div class='playerInfo__color'>
+                <span class='info__color'></span>
+            </div>
+        </div>
+    </div>
     <script type="text/javascript" src="build/desktop.js"></script>
 </body>
 </html>
