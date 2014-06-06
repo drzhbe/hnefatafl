@@ -12,6 +12,7 @@ if (hasUI) {
     $connect = $('.actions__connect');
     $serverValue = $('.actions__connectServer');
     $connect.on('submit', function(e) {
+        // take server and connect to it
         connect($serverValue.val());
         e.preventDefault();
     });
