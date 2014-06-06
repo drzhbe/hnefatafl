@@ -12,7 +12,7 @@ if (hasUI) {
     $connect = $('.actions__connect');
     $serverValue = $('.actions__connectServer');
     $connect.on('submit', function(e) {
-        connect($server.val());
+        connect($serverValue.val());
         e.preventDefault();
     });
     $color = $('.playerInfo__color');
