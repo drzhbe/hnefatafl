@@ -16,6 +16,10 @@ if (hasUI) {
         connect($serverValue.val());
         e.preventDefault();
     });
+    $('.actions__connectToCommonServer').on('click', function(e) {
+        $(this).hide();
+        connect('188.226.139.114:3000');
+    });
     $color = $('.playerInfo__color');
     $server = $('.playerInfo__serverName');
     $serverPopulation = $('.playerInfo__serverPopulation');

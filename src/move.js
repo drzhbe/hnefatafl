@@ -2,6 +2,7 @@ var hasUI = typeof window != 'undefined';
 var $ = require('jquery');
 var state = require('./state');
 var directions = require('./directions');
+var eat = require('./eat');
 
 if (hasUI) {
     var $infoTurn = $('.info__turn');
@@ -53,7 +54,7 @@ function move(from, to, direction, recievedMove) {
         return;
     }
 
-    eatNeighbors(to, direction);
+    eat.neighbors(to, direction);
 
     if (!state.king) {
         // black wins
@@ -72,60 +73,6 @@ function move(from, to, direction, recievedMove) {
     state.turn = state.turn == 'black' ? 'white' : 'black';
     if (hasUI) {
         $infoTurn.addClass('_' + state.turn);
-    }
-}
-
-// store directions outside fn will decrease access speed, but save memory → decrease GC pressure
-// also check for direction where we came from is redundant
-function eatNeighbors(cell, ourDirection) {
-    for (var i = 0; i < directions.list.length; i++) {
-        var direction = directions.list[i];
-        if (direction == ourDirection) {
-            continue;
-        }
-
-        var victim = cell[direction]();
-        if (victim && victim.warrior && victim.warrior.color != cell.warrior.color) {
-
-            // now we have to check 3 neighbors of a king (excluding the `cell`)
-            if (victim.warrior.isKing) {
-                var freedom = 3;
-                for (var j = 0; j < directions.list.length; j++) {
-                    var dir = directions.list[j];
-                    if (directions.opposite(dir) == direction) {
-                        continue;
-                    }
-
-                    var gangerCell = victim[dir]();
-                    if (!gangerCell ||
-                        (gangerCell.warrior && gangerCell.warrior.color != 'white') ||
-                        gangerCell.type) {
-
-                        freedom--;
-                    } else {
-                        break;
-                    }
-                }
-                if (freedom == 0) {
-                    victim.warrior.die();
-                    victim.warrior = null;
-                    state.king = null;
-                    return;
-                    // @TODO: endgame here, black wins
-                }
-            } else {
-                var holder = victim[direction]();
-                if (holder &&
-                    (holder.type == 'corner' ||
-                        (holder.warrior && holder.warrior.color == cell.warrior.color))) {
-
-                    state.rmWarrior(victim.warrior);
-                    victim.warrior.die();
-                    victim.warrior = null;
-                }
-            }
-
-        }
     }
 }
 

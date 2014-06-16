@@ -16705,11 +16705,16 @@ Board.prototype.addCell = function(x, y) {
 
 module.exports = Board;
 
-},{"./cell":48,"./state":53,"./warrior":54,"jquery":4}],48:[function(require,module,exports){
+},{"./cell":48,"./state":54,"./warrior":55,"jquery":4}],48:[function(require,module,exports){
 var $ = require('jquery');
 var state = require('./state');
 var tryToMove = require('./move').tryToMove;
 
+/**
+ * @param {Number} x
+ * @param {Number} y
+ * @param {String|Undefined} type ['corner'|'throne']
+ */
 function Cell(x, y, type) {
     this.x = x;
     this.y = y;
@@ -16754,7 +16759,7 @@ Cell.prototype.right = function() {
 
 module.exports = Cell;
 
-},{"./move":52,"./state":53,"jquery":4}],49:[function(require,module,exports){
+},{"./move":53,"./state":54,"jquery":4}],49:[function(require,module,exports){
 var hasUI = typeof window != 'undefined';
 if (hasUI) {
     var $ = require('jquery');
@@ -16769,8 +16774,13 @@ if (hasUI) {
     $connect = $('.actions__connect');
     $serverValue = $('.actions__connectServer');
     $connect.on('submit', function(e) {
-        connect($server.val());
+        // take server and connect to it
+        connect($serverValue.val());
         e.preventDefault();
+    });
+    $('.actions__connectToCommonServer').on('click', function(e) {
+        $(this).hide();
+        connect('188.226.139.114:3000');
     });
     $color = $('.playerInfo__color');
     $server = $('.playerInfo__serverName');
@@ -16837,7 +16847,7 @@ function connect(server) {
     });
 }
 
-},{"./directions":50,"./game":51,"./move":52,"./state":53,"jquery":4,"socket.io-client":5}],50:[function(require,module,exports){
+},{"./directions":50,"./game":52,"./move":53,"./state":54,"jquery":4,"socket.io-client":5}],50:[function(require,module,exports){
 var directions = ['top', 'right', 'bottom', 'left'];
 function opposite(dir) {
     switch (dir) {
@@ -16874,6 +16884,123 @@ module.exports = {
 };
 
 },{}],51:[function(require,module,exports){
+var directions = require('./directions');
+
+/**
+ * Eat victim on edge of the table
+ * To eat victim on edge it should be `holders` on both sides of the victim
+ * | o
+ * | x o
+ * | o
+ *
+ * @param {Cell} victimCell
+ * @param {String} directionToVictim — direction from `the cell we came to` → to the victim
+ */
+function eatOnEdge(victimCell, directionToVictim) {
+    var sideHolders = 0;
+    // if it is an edge of table, check neighbors of victim, to determine if it is occupied from all directions
+    for (var i = 0; i < directions.list.length; i++) {
+        var direction = directions.list[i];
+        // check only neighbors, dont bother with already checked direction (lack of holder out of an edge)
+        // and dont check the cell where we came to (opposite to directionToVictim)
+        if (direction == directionToVictim || directions.opposite(direction) == directionToVictim) {
+            continue;
+        }
+
+        var sideHolder = victimCell[direction]();
+        if (sideHolder.type == 'corner' ||
+            (sideHolder.warrior && sideHolder.warrior.color != victimCell.warrior.color)) {
+
+            sideHolders++;
+        }
+    }
+    if (sideHolders == 2) {
+        killWarriorAt(victimCell);
+    }
+}
+
+/**
+ * Eat warrior by closing it into the sandwich
+ * |  o  |      |         |
+ * |  x  |  or  |  o x o  |
+ * |  o  |      |         |
+ *
+ * @param {Cell} holderCell
+ * @param {Cell} attackerCell
+ * @param {Cell} victimCell
+ */
+function eatSandwich(holderCell, attackerCell, victimCell) {
+    if (holderCell.type == 'corner' ||
+        // one can be killed by throne if it is empty OR only black could be killed by throne if it is a king on the throne
+        (holderCell.type == 'throne' && (!holderCell.warrior || victimCell.warrior == 'black')) ||
+        (holderCell.warrior && holderCell.warrior.color == attackerCell.warrior.color)) {
+
+        killWarriorAt(victimCell);
+    }
+}
+
+function killWarriorAt(cell) {
+    state.rmWarrior(cell.warrior);
+    cell.warrior.die();
+    cell.warrior = null;
+}
+
+function eatKing(victimCell, directionToVictim) {
+    var freedom = 3;
+    for (var j = 0; j < directions.list.length; j++) {
+        var dir = directions.list[j];
+        if (directions.opposite(dir) == directionToVictim) {
+            continue;
+        }
+
+        var holderCell = victimCell[dir]();
+        if (!holderCell ||
+            (holderCell.warrior && holderCell.warrior.color != 'white') ||
+            holderCell.type) {
+
+            freedom--;
+        } else {
+            break;
+        }
+    }
+    if (freedom == 0) {
+        victimCell.warrior.die();
+        victimCell.warrior = null;
+        state.king = null;
+        return;
+        // @TODO: endgame here, black wins
+    }
+}
+
+module.exports = {
+    neighbors: function(attackerCell, directionOfAttack) {
+        for (var i = 0; i < directions.list.length; i++) {
+            var direction = directions.list[i];
+            // check for direction where we came from is redundant coz it is the cell where we stand now
+            if (directions.opposite(direction) == directionOfAttack) {
+                continue;
+            }
+
+            var victimCell = attackerCell[direction]();
+            if (victimCell && victimCell.warrior && victimCell.warrior.color != attackerCell.warrior.color) {
+
+                // now we have to check 3 neighbors of a king (excluding the `attackerCell`)
+                if (victimCell.warrior.isKing) {
+                    eatKing(victimCell, direction);
+                } else {
+                    var holderCell = victimCell[direction]();
+                    if (holderCell) {
+                        eatSandwich(holderCell, attackerCell, victimCell);
+                    } else {
+                        eatOnEdge(victimCell, direction);
+                    }
+                }
+            }
+        }
+    }
+};
+
+},{"./directions":50}],52:[function(require,module,exports){
 var hasUI = typeof window != 'undefined';
 var Board = require('./board');
 
@@ -16883,11 +17010,12 @@ module.exports = function(socket) {
     state.socket = socket;
 };
 
-},{"./board":47}],52:[function(require,module,exports){
+},{"./board":47}],53:[function(require,module,exports){
 var hasUI = typeof window != 'undefined';
 var $ = require('jquery');
 var state = require('./state');
 var directions = require('./directions');
+var eat = require('./eat');
 
 if (hasUI) {
     var $infoTurn = $('.info__turn');
@@ -16939,7 +17067,7 @@ function move(from, to, direction, recievedMove) {
         return;
     }
 
-    eatNeighbors(to, direction);
+    eat.neighbors(to, direction);
 
     if (!state.king) {
         // black wins
@@ -16958,60 +17086,6 @@ function move(from, to, direction, recievedMove) {
     state.turn = state.turn == 'black' ? 'white' : 'black';
     if (hasUI) {
         $infoTurn.addClass('_' + state.turn);
-    }
-}
-
-// store directions outside fn will decrease access speed, but save memory → decrease GC pressure
-// also check for direction where we came from is redundant
-function eatNeighbors(cell, ourDirection) {
-    for (var i = 0; i < directions.list.length; i++) {
-        var direction = directions.list[i];
-        if (direction == ourDirection) {
-            continue;
-        }
-
-        var victim = cell[direction]();
-        if (victim && victim.warrior && victim.warrior.color != cell.warrior.color) {
-
-            // now we have to check 3 neighbors of a king (excluding the `cell`)
-            if (victim.warrior.isKing) {
-                var freedom = 3;
-                for (var j = 0; j < directions.list.length; j++) {
-                    var dir = directions.list[j];
-                    if (directions.opposite(dir) == direction) {
-                        continue;
-                    }
-
-                    var gangerCell = victim[dir]();
-                    if (!gangerCell ||
-                        (gangerCell.warrior && gangerCell.warrior.color != 'white') ||
-                        gangerCell.type) {
-
-                        freedom--;
-                    } else {
-                        break;
-                    }
-                }
-                if (freedom == 0) {
-                    victim.warrior.die();
-                    victim.warrior = null;
-                    state.king = null;
-                    return;
-                    // @TODO: endgame here, black wins
-                }
-            } else {
-                var holder = victim[direction]();
-                if (holder &&
-                    (holder.type == 'corner' ||
-                        (holder.warrior && holder.warrior.color == cell.warrior.color))) {
-
-                    state.rmWarrior(victim.warrior);
-                    victim.warrior.die();
-                    victim.warrior = null;
-                }
-            }
-
-        }
     }
 }
 
@@ -17044,7 +17118,7 @@ module.exports = {
     move: move
 };
 
-},{"./directions":50,"./state":53,"jquery":4}],53:[function(require,module,exports){
+},{"./directions":50,"./eat":51,"./state":54,"jquery":4}],54:[function(require,module,exports){
 (function (global){
 var state = {
     warriors: {
@@ -17067,7 +17141,7 @@ var state = {
 global.state = state;
 module.exports = state;
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 var $ = require('jquery');
 var state = require('./state');
 
@@ -17114,4 +17188,4 @@ Warrior.prototype.die = function() {
 };
 
 module.exports = Warrior;
-},{"./state":53,"jquery":4}]},{},[49])
+},{"./state":54,"jquery":4}]},{},[49])

@@ -2,6 +2,11 @@ var $ = require('jquery');
 var state = require('./state');
 var tryToMove = require('./move').tryToMove;
 
+/**
+ * @param {Number} x
+ * @param {Number} y
+ * @param {String|Undefined} type ['corner'|'throne']
+ */
 function Cell(x, y, type) {
     this.x = x;
     this.y = y;
