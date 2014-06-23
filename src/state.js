@@ -12,6 +12,7 @@ var state = {
     board: null,
     socket: null, // {socket.io} current client's socket @TODO: so bad to store socket in state
     color: null, // {String} current client's color @TODO: same here
+    ai: null, // {Function} init fn of Artifical Intelligence
     moves: [],
     turn: 'black' // Black starts
 };

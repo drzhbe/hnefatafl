@@ -1,8 +1,10 @@
 var hasUI = typeof window != 'undefined';
 var Board = require('./board');
 
-module.exports = function(socket) {
+module.exports = function(state) {
     state.board = new Board(11);
     state.board.generate(hasUI);
-    state.socket = socket;
+    if (typeof state.ai == 'function') {
+        state.ai(state);
+    }
 };

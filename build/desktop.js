@@ -16760,6 +16760,7 @@ Cell.prototype.right = function() {
 module.exports = Cell;
 
 },{"./move":53,"./state":54,"jquery":4}],49:[function(require,module,exports){
+(function (global){
 var hasUI = typeof window != 'undefined';
 if (hasUI) {
     var $ = require('jquery');
@@ -16820,8 +16821,9 @@ function connect(server) {
 
         socket.emit('wishToPlay');
         socket.on('start', function(data) {
+            state.socket = socket;
             // create game
-            game(socket);
+            game(state);
         });
 
         socket.on('moveDone', function(move) {
@@ -16847,6 +16849,9 @@ function connect(server) {
     });
 }
 
+global.connect = connect;
+
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./directions":50,"./game":52,"./move":53,"./state":54,"jquery":4,"socket.io-client":5}],50:[function(require,module,exports){
 var directions = ['top', 'right', 'bottom', 'left'];
 function opposite(dir) {
@@ -17004,10 +17009,12 @@ module.exports = {
 var hasUI = typeof window != 'undefined';
 var Board = require('./board');
 
-module.exports = function(socket) {
+module.exports = function(state) {
     state.board = new Board(11);
     state.board.generate(hasUI);
-    state.socket = socket;
+    if (typeof state.ai == 'function') {
+        state.ai(state);
+    }
 };
 
 },{"./board":47}],53:[function(require,module,exports){
@@ -17134,6 +17141,7 @@ var state = {
     board: null,
     socket: null, // {socket.io} current client's socket @TODO: so bad to store socket in state
     color: null, // {String} current client's color @TODO: same here
+    ai: null, // {Function} init fn of Artifical Intelligence
     moves: [],
     turn: 'black' // Black starts
 };

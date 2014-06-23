@@ -58,8 +58,9 @@ function connect(server) {
 
         socket.emit('wishToPlay');
         socket.on('start', function(data) {
+            state.socket = socket;
             // create game
-            game(socket);
+            game(state);
         });
 
         socket.on('moveDone', function(move) {
@@ -84,3 +85,5 @@ function connect(server) {
         socket.on('disconnect', function() {});
     });
 }
+
+global.connect = connect;
