@@ -18,7 +18,7 @@ if (hasUI) {
     });
     $('.actions__connectToCommonServer').on('click', function(e) {
         $(this).hide();
-        connect('95.85.56.250/hnefserver');
+        connect('https://hnefatafl-server.herokuapp.com/');
     });
     $color = $('.playerInfo__color');
     $server = $('.playerInfo__serverName');
