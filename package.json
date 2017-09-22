@@ -7,14 +7,8 @@
     "doc": "doc"
   },
   "dependencies": {
-    "browserify": "^4.1.5",
-    "gulp": "^3.6.2",
-    "gulp-concat": "^2.2.0",
     "jquery": "^2.1.1",
-    "through2": "^0.4.2",
-    "vinyl-source-stream": "^0.1.1",
-    "lodash": "^2.4.1",
-    "plumber": "^0.3.2"
+    "lodash": "^2.4.1"
   },
   "devDependencies": {
     "socket.io": "^1.0.1",

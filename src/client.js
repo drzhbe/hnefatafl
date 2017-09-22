@@ -18,7 +18,7 @@ if (hasUI) {
     });
     $('.actions__connectToCommonServer').on('click', function(e) {
         $(this).hide();
-        connect('188.226.139.114:3000');
+        connect('95.85.56.250/hnefserver');
     });
     $color = $('.playerInfo__color');
     $server = $('.playerInfo__serverName');
@@ -34,7 +34,7 @@ function connect(server) {
             server = 'http://' + server;
         }
     } else {
-        server = 'http://localhost:3000';
+        server = 'http://localhost:3030';
     }
     state.server = server;
     var socket = require('socket.io-client')(server);

@@ -1,17 +1,29 @@
-.board__line {
-    display: inline-block;
+body {
+    margin: 0;
+    padding: 0;
+    font-family: helvetica, arial, sans-serif;
 }
-.board__cell {
-    width: 50px;
-    height: 50px;
-    border: 1px solid #555;
+.main {
+    width: 800px;
+    margin: 0 auto;
+    position: relative;
 }
-.board__cell._corner {
-    background: #999;
+
+
+.actions__connectToCommonServer {
+    cursor: pointer;
+    background: #393;
+    color: #fff;
+    text-shadow: 0 1px #000;
+    padding: 5px 10px;
+    font-family: helvetica, arial, sans-serif;
+    font-size: 32px;
 }
-.board__cell._throne {
-    background: #999;
+.actions__connectToCommonServer:hover {
+    box-shadow: 0 0 2px 1px #555;
 }
+
+
 .info {
     font: 23px 'Helvetica', 'Arial', sans-serif;
     background: #f3f3f3;
@@ -36,29 +48,8 @@
 .info__winner {
     display: none;
 }
-body {
-    margin: 0;
-    padding: 0;
-    font-family: helvetica, arial, sans-serif;
-}
-.main {
-    width: 800px;
-    margin: 0 auto;
-    position: relative;
-}
 
-.actions__connectToCommonServer {
-    cursor: pointer;
-    background: #393;
-    color: #fff;
-    text-shadow: 0 1px #000;
-    padding: 5px 10px;
-    font-family: helvetica, arial, sans-serif;
-    font-size: 32px;
-}
-.actions__connectToCommonServer:hover {
-    box-shadow: 0 0 2px 1px #555;
-}
+
 .playerInfo {
     position: absolute;
     right: 0;
@@ -70,6 +61,24 @@ body {
 .playerInfo__serverPopulation {
     display: none;
 }
+
+
+.board__line {
+    display: inline-block;
+}
+.board__cell {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #555;
+}
+.board__cell._corner {
+    background: #999;
+}
+.board__cell._throne {
+    background: #999;
+}
+
+
 .warrior {
     width: 40px;
     height: 40px;

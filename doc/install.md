@@ -1,24 +1,36 @@
-# Работа с кодом
-Первым делом установим зависимости `npm i`
+# Client
+Open `index.html` in browser and type to the console (`F12` key or `cmd + alt + i`) `connect(server)`, where `server` — is address of the server. In the case of local server use `server = 'http://localhost:3000'`.
 
-Все изменения будут попадать в index.html только после сборки. Можно использовать вотчер с авто ребилдом командой `gulp dev`
-
-# Запуск сервера
+# Server
+You can use global server `95.85.56.250/hnefserver` or run local:
 ```javascript
 node server/server.js
 ```
 
-# Запуск клиента
-Запускаем index.html, в консоли браузера пишем `connect(server)`, где `server` — адрес сервера. В случае локального сервера, `server = 'http://localhost:3000'`.
-
-# Запуск бота
+# AI
+You can play with AI. Run it with:
 ```javascript
 node scarlett/scarlett.js
 ```
 
-# Написание бота
-Бот лежит в папке `hnefatafl/scarlett`, где
-`scarlett.js` — инициализация бота и подключение к серверу
-`ai.js` — мозги бота
-Чтобы писать логику можно исправлять функцию `scarlett/ai → analyze`. Сейчас там в зависимости от своего цвета, бот будет делать первый захардкоженный ход.
-Данные о клектах лежат в `state.board.cells`
+# Develop
+Firt of all install dependencies: 
+```javascript
+npm i
+```
+
+For building a project we use webpack:
+```javascript
+npm i -g webpack
+```
+
+To see any changes you should build a project:
+```javascript
+webpack
+```
+
+# Develop AI
+AI is located at `hnefatafl/scarlett`, where
+`scarlett.js` — initialization of AI and connection to the server
+`ai.js` — brain of AI
+To write a logic you can modify function `scarlett/ai → analyze`. For now it will do hardcoded move depending on player's color. To make a decision where to move you can use data stored in `state.board.cells`.
