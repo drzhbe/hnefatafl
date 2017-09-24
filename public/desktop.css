@@ -62,14 +62,17 @@ body {
     display: none;
 }
 
-
-.board__line {
-    display: inline-block;
+.board {
+    display: flex;
 }
 .board__cell {
     width: 50px;
     height: 50px;
     border: 1px solid #555;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #eee;
 }
 .board__cell._corner {
     background: #999;
@@ -85,8 +88,11 @@ body {
     border: 1px solid #222;
     border-radius: 30px;
 }
+.warrior:hover {
+    transform: scale(1.1,1.1);
+}
 .warrior._white {
-    background: #eee;
+    background: #fff;
 }
 .warrior._black {
     background: #111;
