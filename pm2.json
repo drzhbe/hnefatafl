@@ -1,0 +1,8 @@
+{
+  "apps" : [{
+	"name"        	: "hnef-server",
+	"script"      	: "node",
+	"args"			: "server/server.js",
+	"watch"       	: ["./server/server.js"],
+  }]
+}

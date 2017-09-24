@@ -18,7 +18,7 @@ if (hasUI) {
     });
     $('.actions__connectToCommonServer').on('click', function(e) {
         $(this).hide();
-        connect('https://hnefatafl-server.herokuapp.com/');
+        connect('http://hnef.besokind.ru/');
     });
     $color = $('.playerInfo__color');
     $server = $('.playerInfo__serverName');
@@ -29,6 +29,7 @@ if (hasUI) {
  * @param {String} server — w/ or w/o scheme and w/ port ('http://localhost:3000')
  */
 function connect(server) {
+    console.log('\n\nserver', typeof server, server, '\n\n');
     if (server) {
         if (server.indexOf('http://') == -1) {
             server = 'http://' + server;
