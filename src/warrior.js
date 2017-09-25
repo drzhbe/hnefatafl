@@ -19,14 +19,13 @@ Warrior.prototype.generateUI = function(first_argument) {
         // check if it is turn of current client (socket)
         // check if it is turn of current warrior -___-
         if (state.turn == state.color && state.turn == self.color) {
-            if (state.active) {
-                state.active.element.removeClass('_active');
+            if (state.activeWarrior) {
+                state.activeWarrior.element.removeClass('_active');
             }
-            if (state.active == self) {
-                state.active.element.removeClass('_active');
-                state.active = null;
+            if (state.activeWarrior === self) {
+                state.changeActiveWarrior(null);
             } else {
-                state.active = self;
+                state.changeActiveWarrior(self);
                 self.element.addClass('_active');
             }
         }

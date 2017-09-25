@@ -9,21 +9,69 @@ var movement = require('./move');
 var state = require('./state');
 
 if (hasUI) {
-    $connect = $('.actions__connect');
-    $serverValue = $('.actions__connectServer');
-    $connect.on('submit', function(e) {
-        // take server and connect to it
-        connect($serverValue.val());
-        e.preventDefault();
-    });
     $('.actions__connectToCommonServer').on('click', function(e) {
         $(this).hide();
+        $('.intro').hide();
+        $('body').removeClass('_intro');
         connect('http://hnef.besokind.ru/');
     });
-    $color = $('.playerInfo__color');
-    $server = $('.playerInfo__serverName');
-    $serverPopulation = $('.playerInfo__serverPopulation');
-    $serverPopulationCount = $('.playerInfo__serverPopulationCount');
+    $serverPopulation = $('.info__serverPopulation');
+    $serverPopulationCount = $('.info__serverPopulationCount');
+
+
+    // $introKing = $('.intro__king');
+    // $introKing.addClass('_rollIn');
+    // setTimeout(function() {
+    //     $introAxe = $('.intro__axe');
+    //     $introAxe.each(function(i, axe) {
+    //         $(axe).addClass('_rollIn');
+    //     });
+    // }, 1000)
+    // setTimeout(function() {
+    //     $introShield = $('.intro__shield');
+    //     $introShield.each(function(i, shield) {
+    //         $(shield).addClass('_rollIn');
+    //     });
+    // }, 1500)
+
+
+    TweenLite.to($('.intro__king'), 2, {
+        y: window.innerHeight/2
+    });
+
+
+    TweenLite.to($('.intro__shield._left'), 0.8, {
+        x: window.innerWidth/2,
+        rotation: 360,
+        ease: Back.easeOut,
+        delay: 1.5
+    });
+    TweenLite.to($('.intro__shield._right'), 0.8, {
+        x: -window.innerWidth/2,
+        rotation: 360,
+        ease: Back.easeOut,
+        delay: 1.5
+    });
+
+
+    TweenLite.to($('.intro__axe._left'), 1, {
+        x: window.innerWidth/2 - 50,
+        y: -window.innerHeight/2,
+        rotation: 340,
+        delay: 1
+    });
+    TweenLite.to($('.intro__axe._mid'), 1, {
+        y: -window.innerHeight/2+50,
+        rotation: 360,
+        delay: 1
+    });
+    TweenLite.to($('.intro__axe._right'), 1, {
+        x: -window.innerWidth/2 + 50,
+        y: -window.innerHeight/2,
+        rotation: 400,
+        delay: 1
+    });
+    
 }
 /**
  * @param {String} server — w/ or w/o scheme and w/ port ('http://localhost:3000')
@@ -40,15 +88,22 @@ function connect(server) {
     state.server = server;
     var socket = require('socket.io-client')(server);
     socket.on('connect', function() {
-        if (hasUI) {
-            $server.text(server);
-            $serverPopulation.show();
-        }
         socket.on('setColor', function(color) {
             state.color = color;
             if (hasUI) {
-                $color.show();
-                $color.addClass('_' + color);
+                var $info = $('.info');
+                var $brief = $info.find('.info__brief');
+                var $warrior = $brief.find('.warrior');
+                var $goal = $brief.find('.info__goal');
+
+                $warrior.addClass('_' + color);
+
+                var goal = color === 'white'
+                    ? 'to escort <span class="warrior _king"></span> to any corner.'
+                    : 'to catch <span class="warrior _king"></span> before he gets to the corner.';
+                $goal.html(goal);
+
+                $info.show();
             }
         });
         socket.on('usersCountChanged', function(usersCount) {
@@ -62,6 +117,10 @@ function connect(server) {
             state.socket = socket;
             // create game
             game(state);
+
+            $('.info__brief').show();
+            $('.info__turn').show();
+            $('.info__waitingForPlayer').hide();
         });
 
         socket.on('moveDone', function(move) {

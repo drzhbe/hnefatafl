@@ -2,30 +2,44 @@
 <html>
 <head>
     <title>hnefatafl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel='stylesheet' href='public/desktop.css'/>
 </head>
-<body>
-    <div class='info'>
-        <div class='info__turn _black'>Move, <span class="info__color"></span></div>
-        <div class='info__winner'>Winner — <span class="info__color"></span></div>
-    </div>
+<body class='_intro'>
     <div class='main'>
-        <div class='boardWrapper'>
-        </div>
-        <div class='playerInfo'>
-            <!-- <div class='actions__play'>Играть</div> -->
-            <!-- <form class='actions__connect'>
-                <input class='actions__connectServer' type='text' name='server' placeholder='http://localhost:3000' />
-                <input type='submit' value='go' />
-            </form> -->
-            <span class='actions__connectToCommonServer'>join</span>
-            <span class='playerInfo__serverName'></span>
-            <div class='playerInfo__serverPopulation'>Server population: <span class='playerInfo__serverPopulationCount'></span></div>
-            <div class='playerInfo__color'>
-                <span class='info__color'></span>
+        <div class='boardWrapper'></div>
+        <div class='info'>
+            <div class='info__brief'>
+                <span class='info__color'>
+                    You play as <span class='warrior'></span> and your goal is
+                </span>
+                <span class='info__goal'></span>
             </div>
+            <div class='info__winner'>Winner — <span class="warrior"></span></div>
+            <div class='info__turn'>Move, <span class="warrior _black"></span>
+            </div>
+            <div class='info__serverPopulation' title='Server population'>
+                <span class='info__serverPopulationImage'></span>
+                <span class='info__serverPopulationCount'></span>
+            </div>
+            <div class="info__waitingForPlayer">Waiting for another player to join...<br>Send a link to your friend and play together!</div>
         </div>
     </div>
+    <div class='intro'>
+        <div class='intro__king'></div>
+        <div class='intro__shield _left'></div>
+        <div class='intro__shield _right'></div>
+        <div class='intro__axe _left'></div>
+        <div class='intro__axe _mid'></div>
+        <div class='intro__axe _right'></div>
+    </div>
+
+
+    <div class='actions__connectToCommonServer'>Play</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/plugins/CSSPlugin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/easing/EasePack.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/TweenLite.min.js"></script>
 
     <script src="public/desktop.js"></script>
 </body>

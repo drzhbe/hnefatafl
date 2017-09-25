@@ -42,7 +42,7 @@ function move(from, to, direction, recievedMove) {
         from.warrior.element.removeClass('_active');
     }
     from.warrior.move(to);
-    state.active = null; // rm pointer to warrior from active
+    state.changeActiveWarrior(null);
 
     if (to.type == 'corner' && to.warrior.isKing) {
         // white wins
@@ -88,10 +88,10 @@ function isPathFree(from, to, direction) {
 }
 
 function tryToMove(from, to) {
-    if (state.turn == state.color && // check if it is current client's turn
-        from.warrior.color == state.turn && // check if it is warrior's turn
+    if (state.turn === state.color && // check if it is current client's turn
+        from.warrior.color === state.turn && // check if it is warrior's turn
         (!to.type || from.warrior.isKing) && !to.warrior &&
-        (from.x == to.x || from.y == to.y)) {
+        (from.x === to.x || from.y === to.y)) {
 
         var direction = directions.get(from, to);
         if (isPathFree(from, to, direction)) {

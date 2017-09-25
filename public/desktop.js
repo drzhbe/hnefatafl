@@ -55,21 +55,69 @@
 	var state = __webpack_require__(5);
 
 	if (hasUI) {
-	    $connect = $('.actions__connect');
-	    $serverValue = $('.actions__connectServer');
-	    $connect.on('submit', function(e) {
-	        // take server and connect to it
-	        connect($serverValue.val());
-	        e.preventDefault();
-	    });
 	    $('.actions__connectToCommonServer').on('click', function(e) {
 	        $(this).hide();
+	        $('.intro').hide();
+	        $('body').removeClass('_intro');
 	        connect('http://hnef.besokind.ru/');
 	    });
-	    $color = $('.playerInfo__color');
-	    $server = $('.playerInfo__serverName');
-	    $serverPopulation = $('.playerInfo__serverPopulation');
-	    $serverPopulationCount = $('.playerInfo__serverPopulationCount');
+	    $serverPopulation = $('.info__serverPopulation');
+	    $serverPopulationCount = $('.info__serverPopulationCount');
+
+
+	    // $introKing = $('.intro__king');
+	    // $introKing.addClass('_rollIn');
+	    // setTimeout(function() {
+	    //     $introAxe = $('.intro__axe');
+	    //     $introAxe.each(function(i, axe) {
+	    //         $(axe).addClass('_rollIn');
+	    //     });
+	    // }, 1000)
+	    // setTimeout(function() {
+	    //     $introShield = $('.intro__shield');
+	    //     $introShield.each(function(i, shield) {
+	    //         $(shield).addClass('_rollIn');
+	    //     });
+	    // }, 1500)
+
+
+	    TweenLite.to($('.intro__king'), 2, {
+	        y: window.innerHeight/2
+	    });
+
+
+	    TweenLite.to($('.intro__shield._left'), 0.8, {
+	        x: window.innerWidth/2,
+	        rotation: 360,
+	        ease: Back.easeOut,
+	        delay: 1.5
+	    });
+	    TweenLite.to($('.intro__shield._right'), 0.8, {
+	        x: -window.innerWidth/2,
+	        rotation: 360,
+	        ease: Back.easeOut,
+	        delay: 1.5
+	    });
+
+
+	    TweenLite.to($('.intro__axe._left'), 1, {
+	        x: window.innerWidth/2 - 50,
+	        y: -window.innerHeight/2,
+	        rotation: 340,
+	        delay: 1
+	    });
+	    TweenLite.to($('.intro__axe._mid'), 1, {
+	        y: -window.innerHeight/2+50,
+	        rotation: 360,
+	        delay: 1
+	    });
+	    TweenLite.to($('.intro__axe._right'), 1, {
+	        x: -window.innerWidth/2 + 50,
+	        y: -window.innerHeight/2,
+	        rotation: 400,
+	        delay: 1
+	    });
+	    
 	}
 	/**
 	 * @param {String} server — w/ or w/o scheme and w/ port ('http://localhost:3000')
@@ -86,15 +134,22 @@
 	    state.server = server;
 	    var socket = __webpack_require__(10)(server);
 	    socket.on('connect', function() {
-	        if (hasUI) {
-	            $server.text(server);
-	            $serverPopulation.show();
-	        }
 	        socket.on('setColor', function(color) {
 	            state.color = color;
 	            if (hasUI) {
-	                $color.show();
-	                $color.addClass('_' + color);
+	                var $info = $('.info');
+	                var $brief = $info.find('.info__brief');
+	                var $warrior = $brief.find('.warrior');
+	                var $goal = $brief.find('.info__goal');
+
+	                $warrior.addClass('_' + color);
+
+	                var goal = color === 'white'
+	                    ? 'to escort <span class="warrior _king"></span> to any corner.'
+	                    : 'to catch <span class="warrior _king"></span> before he gets to the corner.';
+	                $goal.html(goal);
+
+	                $info.show();
 	            }
 	        });
 	        socket.on('usersCountChanged', function(usersCount) {
@@ -108,6 +163,10 @@
 	            state.socket = socket;
 	            // create game
 	            game(state);
+
+	            $('.info__brief').show();
+	            $('.info__turn').show();
+	            $('.info__waitingForPlayer').hide();
 	        });
 
 	        socket.on('moveDone', function(move) {
@@ -10141,6 +10200,18 @@
 
 	    return this;
 	};
+	Board.prototype.changeActiveCell = function(activeCell) {
+	    // Disable old marks
+	    this.cells.forEach(function(row) {
+	        row.forEach(function(cell) {
+	            cell.mark(false);
+	        });
+	    });
+
+	    if (activeCell) {
+	        activeCell.markPossibleMoves();
+	    }
+	};
 
 	module.exports = Board;
 
@@ -10151,7 +10222,8 @@
 
 	var $ = __webpack_require__(1);
 	var state = __webpack_require__(5);
-	var tryToMove = __webpack_require__(6).tryToMove;
+	var move = __webpack_require__(6);
+	var directions = __webpack_require__(7);
 
 	/**
 	 * @param {Number} x
@@ -10171,8 +10243,11 @@
 	    if (this.type) {
 	        this.element.addClass('_' + this.type);
 	    }
+	    this.element.append($('<div>').addClass('board__cell_moveMarker'));
 	    this.element.on('click', function() {
-	        tryToMove(state.active.cell, self);
+	        if (state.activeWarrior) {
+	            move.tryToMove(state.activeWarrior.cell, self);
+	        }
 	    });
 	};
 	Cell.prototype.top = function() {
@@ -10199,6 +10274,27 @@
 	        return state.board.cells[rightX][this.y];
 	    }
 	};
+	Cell.prototype.mark = function(enable) {
+	    if (!this.element) return;
+	    if (enable) {
+	        this.element.addClass('_possibleMove');
+	    } else {
+	        this.element.removeClass('_possibleMove');
+	    }
+	};
+	Cell.prototype.markPossibleMoves = function() {
+	    directions.list.forEach(this.markDirection.bind(this));
+	};
+	Cell.prototype.markDirection = function(direction) {
+	    var nextCell = this[direction]();
+	    while (nextCell) {
+	        if (nextCell.warrior || nextCell.type == 'corner') {
+	            return;
+	        }
+	        nextCell.mark(true);
+	        nextCell = nextCell[direction]();
+	    }
+	};
 
 	module.exports = Cell;
 
@@ -10217,7 +10313,11 @@
 	        this.warriors[warrior.color].splice(index);
 	    },
 	    king: null, // pointer to King Warrior
-	    active: null, // pointer to active Warrior — clicked and ready to move
+	    activeWarrior: null, // pointer to active Warrior — clicked and ready to move
+	    changeActiveWarrior: function(warrior) {
+	        this.activeWarrior = warrior;
+	        this.board.changeActiveCell(warrior && warrior.cell);
+	    },
 	    board: null,
 	    socket: null, // {socket.io} current client's socket @TODO: so bad to store socket in state
 	    color: null, // {String} current client's color @TODO: same here
@@ -10278,7 +10378,7 @@
 	        from.warrior.element.removeClass('_active');
 	    }
 	    from.warrior.move(to);
-	    state.active = null; // rm pointer to warrior from active
+	    state.changeActiveWarrior(null);
 
 	    if (to.type == 'corner' && to.warrior.isKing) {
 	        // white wins
@@ -10324,10 +10424,10 @@
 	}
 
 	function tryToMove(from, to) {
-	    if (state.turn == state.color && // check if it is current client's turn
-	        from.warrior.color == state.turn && // check if it is warrior's turn
+	    if (state.turn === state.color && // check if it is current client's turn
+	        from.warrior.color === state.turn && // check if it is warrior's turn
 	        (!to.type || from.warrior.isKing) && !to.warrior &&
-	        (from.x == to.x || from.y == to.y)) {
+	        (from.x === to.x || from.y === to.y)) {
 
 	        var direction = directions.get(from, to);
 	        if (isPathFree(from, to, direction)) {
@@ -10528,14 +10628,13 @@
 	        // check if it is turn of current client (socket)
 	        // check if it is turn of current warrior -___-
 	        if (state.turn == state.color && state.turn == self.color) {
-	            if (state.active) {
-	                state.active.element.removeClass('_active');
+	            if (state.activeWarrior) {
+	                state.activeWarrior.element.removeClass('_active');
 	            }
-	            if (state.active == self) {
-	                state.active.element.removeClass('_active');
-	                state.active = null;
+	            if (state.activeWarrior === self) {
+	                state.changeActiveWarrior(null);
 	            } else {
-	                state.active = self;
+	                state.changeActiveWarrior(self);
 	                self.element.addClass('_active');
 	            }
 	        }

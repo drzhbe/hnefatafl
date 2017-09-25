@@ -1,0 +1,91 @@
+<svg width="160" height="160" viewBox="0 0 160 160" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<title>tafl-shield</title>
+<desc>Created using Figma</desc>
+<g id="Canvas" transform="translate(-3443 -1119)">
+<g id="tafl-shield">
+<g id="Ellipse 9">
+<use xlink:href="#path0_fill" transform="translate(3443 1119)" fill="#FFFFFF"/>
+<mask id="mask0_outline_ins">
+<use xlink:href="#path0_fill" fill="white" transform="translate(3443 1119)"/>
+</mask>
+<g mask="url(#mask0_outline_ins)">
+<use xlink:href="#path1_stroke_2x" transform="translate(3443 1119)"/>
+</g>
+</g>
+<g id="Ellipse 10">
+<use xlink:href="#path0_fill" transform="translate(3443 1119)" fill="#FFFFFF"/>
+<mask id="mask1_outline_ins">
+<use xlink:href="#path0_fill" fill="white" transform="translate(3443 1119)"/>
+</mask>
+<g mask="url(#mask1_outline_ins)">
+<use xlink:href="#path2_stroke_2x" transform="translate(3443 1119)" fill="#333333"/>
+</g>
+</g>
+<g id="dots">
+<g id="Ellipse 11">
+<use xlink:href="#path3_fill" transform="matrix(-1 1.16744e-16 1.16743e-16 1 3527 1124)" fill="#FFFFFF"/>
+</g>
+<g id="Ellipse 11">
+<use xlink:href="#path3_fill" transform="matrix(-1 1.16744e-16 1.16743e-16 1 3567 1134)" fill="#FFFFFF"/>
+</g>
+<g id="Ellipse 11">
+<use xlink:href="#path3_fill" transform="matrix(-1 1.16744e-16 1.16743e-16 1 3490 1134)" fill="#FFFFFF"/>
+</g>
+<g id="Ellipse 11">
+<use xlink:href="#path3_fill" transform="matrix(-1 1.16744e-16 1.16743e-16 1 3490 1256)" fill="#FFFFFF"/>
+</g>
+<g id="Ellipse 11">
+<use xlink:href="#path3_fill" transform="matrix(-1 1.16744e-16 1.16743e-16 1 3566.77 1256)" fill="#FFFFFF"/>
+</g>
+<g id="Ellipse 11">
+<use xlink:href="#path3_fill" transform="matrix(-1 1.16744e-16 1.16743e-16 1 3589 1230)" fill="#FFFFFF"/>
+</g>
+<g id="Ellipse 11">
+<use xlink:href="#path3_fill" transform="matrix(-1 1.16744e-16 1.16743e-16 1 3598 1194)" fill="#FFFFFF"/>
+</g>
+<g id="Ellipse 11">
+<use xlink:href="#path3_fill" transform="matrix(-1 1.16744e-16 1.16743e-16 1 3589 1161)" fill="#FFFFFF"/>
+</g>
+<g id="Ellipse 11">
+<use xlink:href="#path3_fill" transform="matrix(-1 1.16744e-16 1.16743e-16 1 3527 1266)" fill="#FFFFFF"/>
+</g>
+<g id="Ellipse 11">
+<use xlink:href="#path4_fill" transform="matrix(-1 1.16744e-16 1.16743e-16 1 3466 1159)" fill="#FFFFFF"/>
+</g>
+<g id="Ellipse 11">
+<use xlink:href="#path5_fill" transform="matrix(-1 1.16744e-16 1.16743e-16 1 3466 1232)" fill="#FFFFFF"/>
+</g>
+<g id="Ellipse 11">
+<use xlink:href="#path3_fill" transform="matrix(-1 1.16744e-16 1.16743e-16 1 3456 1194)" fill="#FFFFFF"/>
+</g>
+</g>
+<g id="herb">
+<g id="Ellipse 12">
+<use xlink:href="#path6_fill" transform="translate(3514.83 1189.67)" fill="#BDBDBD"/>
+</g>
+<g id="Vector">
+<use xlink:href="#path7_fill" transform="translate(3509.5 1147.67)" fill="#BDBDBD"/>
+</g>
+<g id="Vector">
+<use xlink:href="#path7_fill" transform="matrix(6.12323e-17 -1 1 6.12323e-17 3472.75 1211.25)" fill="#BDBDBD"/>
+</g>
+<g id="Vector">
+<use xlink:href="#path7_fill" transform="matrix(-6.12323e-17 -1 -1 6.12323e-17 3573.25 1211.25)" fill="#BDBDBD"/>
+</g>
+<g id="Vector">
+<use xlink:href="#path7_fill" transform="matrix(1 0 0 -1 3509.5 1248)" fill="#BDBDBD"/>
+</g>
+</g>
+</g>
+</g>
+<defs>
+<path id="path0_fill" d="M 160 80C 160 124.183 124.183 160 80 160C 35.8172 160 0 124.183 0 80C 0 35.8172 35.8172 0 80 0C 124.183 0 160 35.8172 160 80Z"/>
+<path id="path1_stroke_2x" d="M 156 80C 156 121.974 121.974 156 80 156L 80 164C 126.392 164 164 126.392 164 80L 156 80ZM 80 156C 38.0264 156 4 121.974 4 80L -4 80C -4 126.392 33.6081 164 80 164L 80 156ZM 4 80C 4 38.0264 38.0264 4 80 4L 80 -4C 33.6081 -4 -4 33.6081 -4 80L 4 80ZM 80 4C 121.974 4 156 38.0264 156 80L 164 80C 164 33.6081 126.392 -4 80 -4L 80 4Z"/>
+<path id="path2_stroke_2x" d="M 142 80C 142 114.242 114.242 142 80 142L 80 178C 134.124 178 178 134.124 178 80L 142 80ZM 80 142C 45.7583 142 18 114.242 18 80L -18 80C -18 134.124 25.8761 178 80 178L 80 142ZM 18 80C 18 45.7583 45.7583 18 80 18L 80 -18C 25.8761 -18 -18 25.8761 -18 80L 18 80ZM 80 18C 114.242 18 142 45.7583 142 80L 178 80C 178 25.8761 134.124 -18 80 -18L 80 18Z"/>
+<path id="path3_fill" d="M 8 4C 8 6.20914 6.20914 8 4 8C 1.79086 8 0 6.20914 0 4C 0 1.79086 1.79086 0 4 0C 6.20914 0 8 1.79086 8 4Z"/>
+<path id="path4_fill" d="M 8 4C 8 6.20914 6.20914 8 4 8C 1.79086 8 0 6.20914 0 4C 0 1.79086 1.79086 0 4 0C 6.20914 0 8 1.79086 8 4Z"/>
+<path id="path5_fill" d="M 7.99999 4C 7.99999 6.20914 6.20913 8 3.99999 8C 1.79085 8 -1.29936e-05 6.20914 -1.29936e-05 4C -1.29936e-05 1.79086 1.79085 0 3.99999 0C 6.20913 0 7.99999 1.79086 7.99999 4Z"/>
+<path id="path6_fill" d="M 16.3333 8.16667C 16.3333 12.677 12.677 16.3333 8.16667 16.3333C 3.65634 16.3333 0 12.677 0 8.16667C 0 3.65634 3.65634 0 8.16667 0C 12.677 0 16.3333 3.65634 16.3333 8.16667Z"/>
+<path id="path7_fill" d="M 13.4999 38.5C 12.2805 38.5 11.1047 38.6871 9.99983 39.0341L 0 2.14979C 3.81061 0.795979 8.46935 0 13.4999 0C 18.5305 0 23.1892 0.795979 26.9998 2.14979L 17 39.0341C 15.8951 38.6871 14.7194 38.5 13.4999 38.5Z"/>
+</defs>
+</svg>

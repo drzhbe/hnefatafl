@@ -22,7 +22,6 @@ io.on('connection', function(socket) {
     });
 
     socket.on('move', function(move) {
-        console.log('MOVE???');
         io.to(playersToRooms[socket.id]).emit('moveDone', move);
     });
 
@@ -32,6 +31,7 @@ io.on('connection', function(socket) {
 
     socket.on('disconnect', function() {
         usersCount--;
+        playingUsersCount--;
         io.emit('usersCountChanged', usersCount);
     });
 });

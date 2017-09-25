@@ -1,6 +1,7 @@
 var $ = require('jquery');
 var state = require('./state');
-var tryToMove = require('./move').tryToMove;
+var move = require('./move');
+var directions = require('./directions');
 
 /**
  * @param {Number} x
@@ -20,8 +21,11 @@ Cell.prototype.generateUI = function() {
     if (this.type) {
         this.element.addClass('_' + this.type);
     }
+    this.element.append($('<div>').addClass('board__cell_moveMarker'));
     this.element.on('click', function() {
-        tryToMove(state.active.cell, self);
+        if (state.activeWarrior) {
+            move.tryToMove(state.activeWarrior.cell, self);
+        }
     });
 };
 Cell.prototype.top = function() {
@@ -46,6 +50,27 @@ Cell.prototype.right = function() {
     var rightX = this.x + 1;
     if (rightX < state.board.size) {
         return state.board.cells[rightX][this.y];
+    }
+};
+Cell.prototype.mark = function(enable) {
+    if (!this.element) return;
+    if (enable) {
+        this.element.addClass('_possibleMove');
+    } else {
+        this.element.removeClass('_possibleMove');
+    }
+};
+Cell.prototype.markPossibleMoves = function() {
+    directions.list.forEach(this.markDirection.bind(this));
+};
+Cell.prototype.markDirection = function(direction) {
+    var nextCell = this[direction]();
+    while (nextCell) {
+        if (nextCell.warrior || nextCell.type == 'corner') {
+            return;
+        }
+        nextCell.mark(true);
+        nextCell = nextCell[direction]();
     }
 };
 

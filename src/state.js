@@ -8,7 +8,11 @@ var state = {
         this.warriors[warrior.color].splice(index);
     },
     king: null, // pointer to King Warrior
-    active: null, // pointer to active Warrior — clicked and ready to move
+    activeWarrior: null, // pointer to active Warrior — clicked and ready to move
+    changeActiveWarrior: function(warrior) {
+        this.activeWarrior = warrior;
+        this.board.changeActiveCell(warrior && warrior.cell);
+    },
     board: null,
     socket: null, // {socket.io} current client's socket @TODO: so bad to store socket in state
     color: null, // {String} current client's color @TODO: same here

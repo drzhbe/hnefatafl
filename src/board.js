@@ -162,5 +162,17 @@ Board.prototype.addCell = function(x, y) {
 
     return this;
 };
+Board.prototype.changeActiveCell = function(activeCell) {
+    // Disable old marks
+    this.cells.forEach(function(row) {
+        row.forEach(function(cell) {
+            cell.mark(false);
+        });
+    });
+
+    if (activeCell) {
+        activeCell.markPossibleMoves();
+    }
+};
 
 module.exports = Board;

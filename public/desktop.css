@@ -1,65 +1,74 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: helvetica, arial, sans-serif;
+    font-family: verdana, sans-serif;
+    display: flex;
+}
+body._intro {
+    overflow: hidden;
 }
 .main {
-    width: 800px;
     margin: 0 auto;
     position: relative;
 }
 
 
 .actions__connectToCommonServer {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, 0);
     cursor: pointer;
-    background: #393;
     color: #fff;
-    text-shadow: 0 1px #000;
+    text-shadow: 0 10px #333;
     padding: 5px 10px;
-    font-family: helvetica, arial, sans-serif;
-    font-size: 32px;
+    font-family: verdana, sans-serif;
+    font-size: 128px;
 }
 .actions__connectToCommonServer:hover {
-    box-shadow: 0 0 2px 1px #555;
+    text-shadow: 0 10px 100px #333;
+    /*box-shadow: 0 0 2px 1px #555;*/
 }
 
 
 .info {
-    font: 23px 'Helvetica', 'Arial', sans-serif;
-    background: #f3f3f3;
-    padding: 5px;
+    width: 550px;
+    display: none;
 }
-.info__color {
+.info .warrior {
     display: inline-block;
-    width: 30px;
-    height: 30px;
-    border: 1px solid #000;
-    border-radius: 20px;
-    padding: 3px;
+    position: relative;
+    top: 14px;
 }
-._black .info__color {
-    text-shadow: 0 1px 0 #333;
-    background: #333;
+.info__brief {
+    display: none;
+    width: 480px;
+    line-height: 30px;
 }
-._white .info__color {
-    text-shadow: 0 1px 0 #fff;
-    background: #fff;
+.info__turn {
+    display: none;
 }
 .info__winner {
     display: none;
 }
-
-
-.playerInfo {
-    position: absolute;
-    right: 0;
-    top: 0;
+.info__serverPopulation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-.playerInfo__color {
-    display: none;
+.info__serverPopulationImage {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    background: url('img/tafl-helm.svg');
+    background-size: cover;
 }
-.playerInfo__serverPopulation {
-    display: none;
+.info__serverPopulationCount {
+    margin-left: 10px;
+}
+.info__waitingForPlayer {
+    display: flex;
+    justify-content: center;
 }
 
 .board {
@@ -73,6 +82,7 @@ body {
     justify-content: center;
     align-items: center;
     background: #eee;
+    perspective: 30px;
 }
 .board__cell._corner {
     background: #999;
@@ -80,26 +90,119 @@ body {
 .board__cell._throne {
     background: #999;
 }
+.board__cell._possibleMove .board__cell_moveMarker {
+    display: block;
+}
+.board__cell_moveMarker {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 30px;
+    box-shadow: 0px 0px 20px #777;
+    display: none;
+}
 
 
 .warrior {
     width: 40px;
     height: 40px;
-    border: 1px solid #222;
     border-radius: 30px;
 }
 .warrior:hover {
     transform: scale(1.1,1.1);
+    box-shadow: 0px 0px 20px #777;
 }
 .warrior._white {
-    background: #fff;
+    /*background: #fff;*/
+    background-image: url('img/tafl-shield.svg');
+    background-size: contain;
 }
 .warrior._black {
-    background: #111;
+    /*background: #111;*/
+    background-image: url('img/tafl-axe.svg');
+    background-size: contain;
 }
 .warrior._king {
-    box-shadow: inset 0 0 1em gold;
+    /*box-shadow: inset 0 0 1em gold;*/
+    background-image: url('img/tafl-crown.svg');
+    background-size: contain;
 }
 .warrior._active {
-    border: 5px solid #d33;
+    /*border: 5px solid #d33;*/
+    box-shadow: 0px 0px 20px #222;
+}
+
+
+/* INTRO */
+
+.intro__king {
+    position: absolute;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 200px;
+    background-image: url('img/tafl-crown.svg');
+    background-size: contain;
+    /*-webkit-transition: all 2000ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition:         all 2000ms cubic-bezier(0.175, 0.885, 0.32, 1.275);*/
+}
+.intro__king._rollIn {
+    transform: translate(-50%, 50vh) rotate(360deg);
+}
+
+
+.intro__shield {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-image: url('img/tafl-shield.svg');
+    background-size: contain;
+    /*-webkit-transition: all 500ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition:         all 500ms cubic-bezier(0.175, 0.885, 0.32, 1.275);*/
+}
+.intro__shield._left {
+    left: -200px;
+}
+.intro__shield._right {
+    right: -200px;
+}
+.intro__shield._left._rollIn {
+    transform: translate(50vw, -50%) rotate(300deg);
+}
+.intro__shield._right._rollIn {
+    transform: translate(-50vw, -50%) rotate(300deg);
+}
+
+
+.intro__axe {
+    position: absolute;
+    bottom: -200px;
+    width: 200px;
+    height: 200px;
+    background-image: url('img/tafl-axe.svg');
+    background-size: contain;
+    /*-webkit-transition: all 1500ms;
+    transition:         all 1500ms;*/
+}
+.intro__axe._left {
+    left: -200px;
+}
+.intro__axe._mid {
+    left: 50%;
+    transform: translateX(-50%);
+}
+.intro__axe._right {
+    left: 100vw;
+}
+.intro__axe._left._rollIn {
+    transform: translateX(45vw) translateY(-200%) rotate(340deg);
+}
+.intro__axe._mid._rollIn {
+    transform: translateX(-50%) translateY(-50vh) rotate(360deg);
+}
+.intro__axe._right._rollIn {
+    transform: translateX(-45vw) translateY(-200%) rotate(400deg);
 }
