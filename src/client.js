@@ -88,7 +88,7 @@ function connect(server) {
         server = 'http://localhost:3030';
     }
     state.server = server;
-    var socket = require('socket.io-client')(server, {resource: 'server/socket.io'});
+    var socket = require('socket.io-client')(server, {path: '/server/socket.io'});
     socket.on('connect', function() {
         socket.on('setColor', function(color) {
             state.color = color;

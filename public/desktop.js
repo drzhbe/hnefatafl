@@ -134,7 +134,7 @@
 	        server = 'http://localhost:3030';
 	    }
 	    state.server = server;
-	    var socket = __webpack_require__(10)(server, {resource: 'server/socket.io'});
+	    var socket = __webpack_require__(10)(server, {path: '/server/socket.io'});
 	    socket.on('connect', function() {
 	        socket.on('setColor', function(color) {
 	            state.color = color;

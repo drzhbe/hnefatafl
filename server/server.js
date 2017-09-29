@@ -35,4 +35,4 @@ io.on('connection', function(socket) {
         io.emit('usersCountChanged', usersCount);
     });
 });
-io.listen(3030, {resource: '/server/socket.io'});
+io.listen(3030, {path: '/server/socket.io'});
