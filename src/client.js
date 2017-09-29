@@ -14,7 +14,7 @@ if (hasUI) {
         $(this).hide();
         $('.intro').hide();
         $('body').removeClass('_intro');
-        connect('http://tafl.website');
+        connect('https://tafl.website');
         amplitude.getInstance().logEvent('PLAY_CLICKED');
     });
     $serverPopulation = $('.info__serverPopulation');
@@ -81,7 +81,7 @@ if (hasUI) {
 function connect(server) {
     console.log('\n\nserver', typeof server, server, '\n\n');
     if (server) {
-        if (server.indexOf('http://') == -1) {
+        if (server.indexOf('http') == -1) {
             server = 'http://' + server;
         }
     } else {
