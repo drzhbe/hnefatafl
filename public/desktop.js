@@ -55,11 +55,13 @@
 	var state = __webpack_require__(5);
 
 	if (hasUI) {
+	    amplitude.getInstance().logEvent('INTRO_STARTED');
 	    $('.actions__connectToCommonServer').on('click', function(e) {
 	        $(this).hide();
 	        $('.intro').hide();
 	        $('body').removeClass('_intro');
-	        connect('http://hnef.besokind.ru/');
+	        connect('http://tafl.website');
+	        amplitude.getInstance().logEvent('PLAY_CLICKED');
 	    });
 	    $serverPopulation = $('.info__serverPopulation');
 	    $serverPopulationCount = $('.info__serverPopulationCount');
@@ -132,7 +134,7 @@
 	        server = 'http://localhost:3030';
 	    }
 	    state.server = server;
-	    var socket = __webpack_require__(10)(server);
+	    var socket = __webpack_require__(10)(server, {resource: 'server/socket.io'});
 	    socket.on('connect', function() {
 	        socket.on('setColor', function(color) {
 	            state.color = color;
@@ -167,6 +169,8 @@
 	            $('.info__brief').show();
 	            $('.info__turn').show();
 	            $('.info__waitingForPlayer').hide();
+
+	            amplitude.getInstance().logEvent('GAME_STARTED');
 	        });
 
 	        socket.on('moveDone', function(move) {
