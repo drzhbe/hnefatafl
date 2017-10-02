@@ -1,6 +1,8 @@
 hnefatafl
 =========
 
+[![final animation](https://my.mixtape.moe/qzugml.gif)](https://tafl.website/)
+
 Hnefatafl, the Scandinavian board game
 
 Multiplayer client and server shipped for the moment.
