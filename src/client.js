@@ -10,7 +10,7 @@ var state = require('./state');
 
 if (hasUI) {
     amplitude.getInstance().logEvent('INTRO_STARTED');
-    $('.actions__connectToCommonServer').on('click', function(e) {
+    $('.actions__play').on('click', function(e) {
         $(this).hide();
         $('.intro').hide();
         $('body').removeClass('_intro');
@@ -21,59 +21,12 @@ if (hasUI) {
     $serverPopulationCount = $('.info__serverPopulationCount');
 
 
-    // $introKing = $('.intro__king');
-    // $introKing.addClass('_rollIn');
-    // setTimeout(function() {
-    //     $introAxe = $('.intro__axe');
-    //     $introAxe.each(function(i, axe) {
-    //         $(axe).addClass('_rollIn');
-    //     });
-    // }, 1000)
-    // setTimeout(function() {
-    //     $introShield = $('.intro__shield');
-    //     $introShield.each(function(i, shield) {
-    //         $(shield).addClass('_rollIn');
-    //     });
-    // }, 1500)
-
-
-    TweenLite.to($('.intro__king'), 2, {
-        y: window.innerHeight/2
+    // Intro animation finish
+    var stroke = $('#path0_stroke');
+    stroke.one('animationend', function () {
+        $('#play-svg-blur').show();
+        stroke.attr('fill', '#000')
     });
-
-
-    TweenLite.to($('.intro__shield._left'), 0.8, {
-        x: window.innerWidth/2,
-        rotation: 360,
-        ease: Back.easeOut,
-        delay: 1.5
-    });
-    TweenLite.to($('.intro__shield._right'), 0.8, {
-        x: -window.innerWidth/2,
-        rotation: 360,
-        ease: Back.easeOut,
-        delay: 1.5
-    });
-
-
-    TweenLite.to($('.intro__axe._left'), 1, {
-        x: window.innerWidth/2 - 50,
-        y: -window.innerHeight/2,
-        rotation: 340,
-        delay: 1
-    });
-    TweenLite.to($('.intro__axe._mid'), 1, {
-        y: -window.innerHeight/2+50,
-        rotation: 360,
-        delay: 1
-    });
-    TweenLite.to($('.intro__axe._right'), 1, {
-        x: -window.innerWidth/2 + 50,
-        y: -window.innerHeight/2,
-        rotation: 400,
-        delay: 1
-    });
-    
 }
 /**
  * @param {String} server — w/ or w/o scheme and w/ port ('http://localhost:3000')
@@ -91,6 +44,9 @@ function connect(server) {
     var socket = require('socket.io-client')(server, {path: '/server/socket.io'});
     socket.on('connect', function() {
         socket.on('setColor', function(color) {
+            // If color exists it means we already in game and it is just a reconnect.
+            if (state.color) return;
+
             state.color = color;
             if (hasUI) {
                 var $info = $('.info');
@@ -116,6 +72,11 @@ function connect(server) {
 
         socket.emit('wishToPlay');
         socket.on('start', function(data) {
+            console.log('Recieved `start` signal from socket')
+
+            // If board exists it means we already in game and it is just a reconnect.
+            if (state.board) return;
+
             state.socket = socket;
             // create game
             game(state);
@@ -146,7 +107,9 @@ function connect(server) {
             });
         }
 
-        socket.on('disconnect', function() {});
+        socket.on('disconnect', function() {
+            console.log('disconnected from server');
+        });
     });
 }
 

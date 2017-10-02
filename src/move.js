@@ -38,7 +38,41 @@ function move(from, to, direction, recievedMove) {
         sendMove(moveRec);
     }
     if (hasUI) {
-        to.element.append( from.warrior.element.detach() );
+        warriorEl = $(from.warrior.element);
+        var tweenProps = {
+            clearProps: 'transform',
+            onComplete: function() {
+                warriorEl.removeClass('_animating');
+                warriorEl.css({top:5,left:5});
+                to.element.append( warriorEl.detach() );
+
+                eat.neighbors(to, direction);
+            }
+        };
+        switch (direction) {
+            case 'top':
+                tweenProps.y = (to.y - from.y) * from.size - 7;
+                break;
+            case 'bottom':
+                tweenProps.y = (to.y - from.y) * from.size + 7;
+                break;
+            case 'left':
+                tweenProps.x = (to.x - from.x) * from.size - 7;
+                break;
+            case 'right':
+                tweenProps.x = (to.x - from.x) * from.size + 7;
+                break;
+        }
+
+        // Detach warrior from cell to board to have highest Z index
+        // Set _animating to have position absolute
+        warriorEl.addClass('_animating');
+        var offset = warriorEl.offset();
+        $('.board').append(warriorEl.detach());
+        warriorEl.offset(offset);
+
+        TweenLite.to(from.warrior.element, 1, tweenProps);
+        
         from.warrior.element.removeClass('_active');
     }
     from.warrior.move(to);
@@ -54,7 +88,9 @@ function move(from, to, direction, recievedMove) {
         return;
     }
 
-    eat.neighbors(to, direction);
+    if (!hasUI) {
+        eat.neighbors(to, direction);
+    }
 
     if (!state.king) {
         // black wins

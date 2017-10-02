@@ -29,20 +29,90 @@
         </div>
     </div>
     <div class='intro'>
-        <div class='intro__king'></div>
-        <div class='intro__shield _left'></div>
-        <div class='intro__shield _right'></div>
-        <div class='intro__axe _left'></div>
-        <div class='intro__axe _mid'></div>
-        <div class='intro__axe _right'></div>
+        <div class='actions__play'>
+            <svg width="551" height="197" viewBox="-10 -20 560 202" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="play-svg-blur" style='display: none'><use xlink:href="#path0_stroke"/></g>
+            <g id="play-svg-stroke"><use xlink:href="#path0_stroke"/></g>
+            <path id="path0_stroke" stroke-width='4' stroke-linecap="round" stroke='#000' fill='#fff' stroke-miterlimit='0' d="M 0 0L 2.56074 -3.07289L -4 -8.54017L -4 0L 0 0ZM 69 57.5L 70.5385 61.1923L 76.6321 58.6533L 71.5607 54.4271L 69 57.5ZM 146.5 172.5L 142.5 172.5L 142.5 180.433L 148.878 175.716L 146.5 172.5ZM 321 0L 324.811 -1.21509L 320.243 -15.5426L 317.089 -0.838891L 321 0ZM 308.667 57.5L 304.756 56.6611L 304.756 56.6611L 308.667 57.5ZM 339.333 57.5L 343.144 56.2849L 343.144 56.2849L 339.333 57.5ZM -2.56074 3.07289L 66.4393 60.5729L 71.5607 54.4271L 2.56074 -3.07289L -2.56074 3.07289ZM 4 86.25L 4 0L -4 0L -4 86.25L 4 86.25ZM 67.4615 53.8077L -1.53846 82.5577L 1.53846 89.9423L 70.5385 61.1923L 67.4615 53.8077ZM 148.878 175.716L 208.378 131.716L 203.622 125.284L 144.122 169.284L 148.878 175.716ZM 142.5 0L 142.5 144.25L 150.5 144.25L 150.5 0L 142.5 0ZM 142.5 144.25L 142.5 172.5L 150.5 172.5L 150.5 144.25L 142.5 144.25ZM 148.816 147.511L 208.316 105.261L 203.684 98.7386L 144.184 140.989L 148.816 147.511ZM 317.089 -0.838891L 304.756 56.6611L 312.578 58.3389L 324.911 0.838891L 317.089 -0.838891ZM 304.756 56.6611L 280.089 171.661L 287.911 173.339L 312.578 58.3389L 304.756 56.6611ZM 304.857 58.7201L 341.691 173.72L 349.309 171.28L 312.476 56.2799L 304.857 58.7201ZM 490.355 84.0718L 434.355 -2.17824L 427.645 2.17824L 483.645 88.4283L 490.355 84.0718ZM 490.355 88.4283L 546.355 2.17824L 539.645 -2.17824L 483.645 84.0718L 490.355 88.4283ZM 483 86.25L 483 120.5L 491 120.5L 491 86.25L 483 86.25ZM 483 120.5L 483 172.5L 491 172.5L 491 120.5L 483 120.5ZM 4 172.5L 4 86.25L -4 86.25L -4 172.5L 4 172.5ZM 490.355 122.678L 546.355 36.4282L 539.645 32.0718L 483.645 118.322L 490.355 122.678ZM 317.189 1.21509L 335.522 58.7151L 343.144 56.2849L 324.811 -1.21509L 317.189 1.21509ZM 335.522 58.7151L 372.189 173.715L 379.811 171.285L 343.144 56.2849L 335.522 58.7151ZM 142.5 0L 142.5 115L 150.5 115L 150.5 0L 142.5 0Z"/>
+            <filter id="play-blur-filter" x="-2" y="-2" width="200" height="200">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
+            </filter>
+            </svg>
+        </div>
     </div>
 
 
-    <div class='actions__connectToCommonServer'>Play</div>
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/plugins/CSSPlugin.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/easing/EasePack.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/TweenLite.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/4.4.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.4.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.4.0/firebase-database.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyBdKPXwaJJc-xOUm1SX7AKMpxPmeaBaaws",
+        authDomain: "helpful-seer-773.firebaseapp.com",
+        databaseURL: "https://helpful-seer-773.firebaseio.com",
+        projectId: "helpful-seer-773",
+        storageBucket: "",
+        messagingSenderId: "708063247860"
+      };
+      firebase.initializeApp(config);
+    </script>
+    <script>
+        /*
+            user.status
+                0 blank
+                1 looking for a game
+                2 playing
+        */
+        var auth = firebase.auth();
+        var db = firebase.database();
+        auth.signInAnonymously().catch(function(error) {
+            console.error(error.code, error.message);
+        });
+        auth.onAuthStateChanged(function(user) {
+            if (!user) return;
+            console.log('\n\nuser', typeof user, user, '\n\n');
+            db.ref('users/'+user.uid).transaction(function(dbUser) {
+                if (!dbUser) {
+                    // New user – create it in db
+                    dbUser = {
+                        id: user.uid,
+                        name: user.displayName || 'player',
+                        wins: 0,
+                        loses: 0,
+                        points: 0,
+                        status: 0
+                    };
+                }
+                userLoggedIn(dbUser);
+                return dbUser;
+            });
+        });
+        function userLoggedIn(user) {
+            db.ref('users-online/'+user.id).set(user);
+            db.ref('users-online').child(user.id).onDisconnect().remove();
+        }
+
+        // Show online users count
+        db.ref('users-online').on('value', function(snap) {
+            var usersOnlineCount = snap.numChildren();
+            document.querySelectorAll('.info__serverPopulationCount')[0].innerText = usersOnlineCount;
+        });
+
+        function userIsLookingForAGame() {
+            db.ref('users/'+auth.currentUser.uid).update({status: 1});
+        }
+
+        function gameStarted() {
+            db.ref('users/'+auth.currentUser.uid).update({status: 2});
+        }
+    </script>
 
     <script src="desktop.js"></script>
 </body>

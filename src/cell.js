@@ -15,6 +15,9 @@ function Cell(x, y, type) {
     this.warrior = null;
     this.element = null; // {Null|jQuery}
 };
+Cell.prototype.size = 50;
+
+
 Cell.prototype.generateUI = function() {
     var self = this;
     this.element = $('<div>').addClass('board__cell');
