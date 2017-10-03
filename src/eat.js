@@ -54,7 +54,7 @@ function eatSandwich(holderCell, attackerCell, victimCell) {
 }
 
 function killWarriorAt(cell) {
-    state.rmWarrior(cell.warrior);
+    state.removeWarrior(cell.warrior);
     cell.warrior.die();
     cell.warrior = null;
 }

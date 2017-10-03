@@ -6,7 +6,7 @@ if (hasUI) {
 var game = require('./game');
 var directions = require('./directions');
 var movement = require('./move');
-var state = require('./state');
+var state = require('./state').state;
 
 if (hasUI) {
     amplitude.getInstance().logEvent('INTRO_STARTED');
@@ -43,6 +43,9 @@ function connect(server) {
     state.server = server;
     var socket = require('socket.io-client')(server, {path: '/server/socket.io'});
     socket.on('connect', function() {
+        socket.on('connected', function(socketId) {
+            console.log('\n\nsocketId', typeof socketId, socketId, '\n\n');
+        });
         socket.on('setColor', function(color) {
             // If color exists it means we already in game and it is just a reconnect.
             if (state.color) return;
@@ -89,15 +92,13 @@ function connect(server) {
         });
 
         socket.on('moveDone', function(move) {
+            console.log(typeof move, 'move', move);
             // if opponent's move done
             if (state.color != move.color) {
                 var from = state.board.cells[move.x1][move.y1];
                 var to = state.board.cells[move.x2][move.y2];
-                // @TODO: dont do usual move
-                // all i need is to actualize state by this recieved move
-                movement.move(from, to, directions.get(from, to), true);
+                movement.tryToMove(from, to, true);
             }
-            console.log(typeof move, 'move', move);
             // @TODO: send moveData on move and recieve moveData on enemyMove
         });
 

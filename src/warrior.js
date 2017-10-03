@@ -1,10 +1,14 @@
 var $ = require('jquery');
-var state = require('./state');
+var state = require('./state').state;
 
 function Warrior(color, isKing) {
     this.cell = null;
     this.color = color;
     this.isKing = isKing || false;
+
+    if (!isKing) {
+        state.warriors[color].push( this );
+    }
 }
 Warrior.prototype.generateUI = function(first_argument) {
     var self = this;

@@ -2,7 +2,7 @@ var server = 'http://localhost:3000';
 var socket = require('socket.io-client')(server);
 var game = require('../src/game');
 var ai = require('./ai');
-var state = require('../src/state');
+var state = require('../src/state').state;
 state.ai = ai;
 
 socket.on('connect', function() {

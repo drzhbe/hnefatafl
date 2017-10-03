@@ -1,7 +1,7 @@
 var $ = require('jquery');
 var Cell = require('./cell');
 var Warrior = require('./warrior');
-var state = require('./state');
+var state = require('./state').state;
 
 function Board(size) {
     this.size = size;
@@ -59,11 +59,6 @@ Board.prototype.generate = function(hasUI) {
 
     return this;
 };
-function addWarrior(color) {
-    var warrior = new Warrior(color);
-    state.warriors[color].push( warrior );
-    return warrior;
-}
 Board.prototype.addCell = function(x, y) {
     var size = this.size;
     var lastIndex = size - 1;
@@ -88,79 +83,9 @@ Board.prototype.addCell = function(x, y) {
     var cell = new Cell(x, y, cellType);
     this.cells[x].push( cell );
 
-    var warrior;
+    cell.addWarriorHnefatafl(size);
 
-    // Place black Warriors
-    if ((y == 0 || y == lastIndex) && 
-        (x > 2 && x < lastIndex - 2)) {
-
-        warrior = addWarrior('black');
-    } else if ((x == 0 || x == lastIndex) &&
-        (y > 2 && y < lastIndex - 2)) {
-
-        warrior = addWarrior('black');
-    } else if (x == centerIndex && (y == 1 || y == lastIndex - 1)) {
-        warrior = addWarrior('black');
-    } else if (y == centerIndex && (x == 1 || x == lastIndex - 1)) {
-        warrior = addWarrior('black');
-    }
-
-    // @TODO: following conditions should else if
-
-    // Place the King and white Warriors
-    /*
-            x
-          x x x
-        x x o x x
-          x x x
-            x
-    */
-    if (x == centerIndex &&
-        y == centerIndex) {
-
-        warrior = new Warrior('white', true);
-        state.king = warrior;
-    /*
-            x
-          x x x
-        o o x o o
-          x x x
-            x
-    */
-    } else if (x == centerIndex &&
-        (y > centerIndex - 3 && y < centerIndex + 3)) {
-
-        warrior = addWarrior('white');
-    /*
-            o
-          x o x
-        x x x x x
-          x o x
-            o
-    */
-    } else if (y == centerIndex &&
-        (x > centerIndex - 3 && x < centerIndex + 3)) {
-
-        warrior = addWarrior('white');
-    /*
-            x
-          o x o
-        x x x x x
-          o x o
-            x
-    */
-    } else if ((x == centerIndex - 1 || x == centerIndex + 1) &&
-        (y == centerIndex - 1 || y == centerIndex + 1)) {
-
-        warrior = addWarrior('white');
-    }
-
-    if (warrior) {
-        warrior.cell = cell;
-        cell.warrior = warrior;
-    }
-
-    return this;
+    return cell;
 };
 Board.prototype.changeActiveCell = function(activeCell) {
     // Disable old marks

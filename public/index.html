@@ -77,7 +77,6 @@
         });
         auth.onAuthStateChanged(function(user) {
             if (!user) return;
-            console.log('\n\nuser', typeof user, user, '\n\n');
             db.ref('users/'+user.uid).transaction(function(dbUser) {
                 if (!dbUser) {
                     // New user – create it in db

@@ -52,7 +52,7 @@
 	var game = __webpack_require__(2);
 	var directions = __webpack_require__(7);
 	var movement = __webpack_require__(6);
-	var state = __webpack_require__(5);
+	var state = __webpack_require__(5).state;
 
 	if (hasUI) {
 	    amplitude.getInstance().logEvent('INTRO_STARTED');
@@ -89,6 +89,9 @@
 	    state.server = server;
 	    var socket = __webpack_require__(10)(server, {path: '/server/socket.io'});
 	    socket.on('connect', function() {
+	        socket.on('connected', function(socketId) {
+	            console.log('\n\nsocketId', typeof socketId, socketId, '\n\n');
+	        });
 	        socket.on('setColor', function(color) {
 	            // If color exists it means we already in game and it is just a reconnect.
 	            if (state.color) return;
@@ -135,15 +138,13 @@
 	        });
 
 	        socket.on('moveDone', function(move) {
+	            console.log(typeof move, 'move', move);
 	            // if opponent's move done
 	            if (state.color != move.color) {
 	                var from = state.board.cells[move.x1][move.y1];
 	                var to = state.board.cells[move.x2][move.y2];
-	                // @TODO: dont do usual move
-	                // all i need is to actualize state by this recieved move
-	                movement.move(from, to, directions.get(from, to), true);
+	                movement.tryToMove(from, to, true);
 	            }
-	            console.log(typeof move, 'move', move);
 	            // @TODO: send moveData on move and recieve moveData on enemyMove
 	        });
 
@@ -10006,7 +10007,7 @@
 	var $ = __webpack_require__(1);
 	var Cell = __webpack_require__(4);
 	var Warrior = __webpack_require__(9);
-	var state = __webpack_require__(5);
+	var state = __webpack_require__(5).state;
 
 	function Board(size) {
 	    this.size = size;
@@ -10064,11 +10065,6 @@
 
 	    return this;
 	};
-	function addWarrior(color) {
-	    var warrior = new Warrior(color);
-	    state.warriors[color].push( warrior );
-	    return warrior;
-	}
 	Board.prototype.addCell = function(x, y) {
 	    var size = this.size;
 	    var lastIndex = size - 1;
@@ -10093,79 +10089,9 @@
 	    var cell = new Cell(x, y, cellType);
 	    this.cells[x].push( cell );
 
-	    var warrior;
+	    cell.addWarriorHnefatafl(size);
 
-	    // Place black Warriors
-	    if ((y == 0 || y == lastIndex) && 
-	        (x > 2 && x < lastIndex - 2)) {
-
-	        warrior = addWarrior('black');
-	    } else if ((x == 0 || x == lastIndex) &&
-	        (y > 2 && y < lastIndex - 2)) {
-
-	        warrior = addWarrior('black');
-	    } else if (x == centerIndex && (y == 1 || y == lastIndex - 1)) {
-	        warrior = addWarrior('black');
-	    } else if (y == centerIndex && (x == 1 || x == lastIndex - 1)) {
-	        warrior = addWarrior('black');
-	    }
-
-	    // @TODO: following conditions should else if
-
-	    // Place the King and white Warriors
-	    /*
-	            x
-	          x x x
-	        x x o x x
-	          x x x
-	            x
-	    */
-	    if (x == centerIndex &&
-	        y == centerIndex) {
-
-	        warrior = new Warrior('white', true);
-	        state.king = warrior;
-	    /*
-	            x
-	          x x x
-	        o o x o o
-	          x x x
-	            x
-	    */
-	    } else if (x == centerIndex &&
-	        (y > centerIndex - 3 && y < centerIndex + 3)) {
-
-	        warrior = addWarrior('white');
-	    /*
-	            o
-	          x o x
-	        x x x x x
-	          x o x
-	            o
-	    */
-	    } else if (y == centerIndex &&
-	        (x > centerIndex - 3 && x < centerIndex + 3)) {
-
-	        warrior = addWarrior('white');
-	    /*
-	            x
-	          o x o
-	        x x x x x
-	          o x o
-	            x
-	    */
-	    } else if ((x == centerIndex - 1 || x == centerIndex + 1) &&
-	        (y == centerIndex - 1 || y == centerIndex + 1)) {
-
-	        warrior = addWarrior('white');
-	    }
-
-	    if (warrior) {
-	        warrior.cell = cell;
-	        cell.warrior = warrior;
-	    }
-
-	    return this;
+	    return cell;
 	};
 	Board.prototype.changeActiveCell = function(activeCell) {
 	    // Disable old marks
@@ -10188,9 +10114,10 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var $ = __webpack_require__(1);
-	var state = __webpack_require__(5);
+	var state = __webpack_require__(5).state;
 	var move = __webpack_require__(6);
 	var directions = __webpack_require__(7);
+	var Warrior = __webpack_require__(9);
 
 	/**
 	 * @param {Number} x
@@ -10266,6 +10193,84 @@
 	    }
 	};
 
+	Cell.prototype.addWarriorHnefatafl = function(boardSize) {
+	    var lastIndex = boardSize - 1;
+	    var centerIndex = boardSize >> 1; // divide by 2 and floor
+	    var x = this.x;
+	    var y = this.y;
+	    var warrior;
+
+	    // Place black Warriors
+	    if ((y == 0 || y == lastIndex) && 
+	        (x > 2 && x < lastIndex - 2)) {
+
+	        warrior = new Warrior('black');
+	    } else if ((x == 0 || x == lastIndex) &&
+	        (y > 2 && y < lastIndex - 2)) {
+
+	        warrior = new Warrior('black');
+	    } else if (x == centerIndex && (y == 1 || y == lastIndex - 1)) {
+	        warrior = new Warrior('black');
+	    } else if (y == centerIndex && (x == 1 || x == lastIndex - 1)) {
+	        warrior = new Warrior('black');
+	    }
+
+	    // @TODO: following conditions should else if
+
+	    // Place the King and white Warriors
+	    /*
+	            x
+	          x x x
+	        x x o x x
+	          x x x
+	            x
+	    */
+	    if (x == centerIndex &&
+	        y == centerIndex) {
+
+	        warrior = new Warrior('white', true);
+	        state.king = warrior;
+	    /*
+	            x
+	          x x x
+	        o o x o o
+	          x x x
+	            x
+	    */
+	    } else if (x == centerIndex &&
+	        (y > centerIndex - 3 && y < centerIndex + 3)) {
+
+	        warrior = new Warrior('white');
+	    /*
+	            o
+	          x o x
+	        x x x x x
+	          x o x
+	            o
+	    */
+	    } else if (y == centerIndex &&
+	        (x > centerIndex - 3 && x < centerIndex + 3)) {
+
+	        warrior = new Warrior('white');
+	    /*
+	            x
+	          o x o
+	        x x x x x
+	          o x o
+	            x
+	    */
+	    } else if ((x == centerIndex - 1 || x == centerIndex + 1) &&
+	        (y == centerIndex - 1 || y == centerIndex + 1)) {
+
+	        warrior = new Warrior('white');
+	    }
+
+	    if (warrior) {
+	        warrior.cell = this;
+	        this.warrior = warrior;
+	    }
+	};
+
 	module.exports = Cell;
 
 
@@ -10273,31 +10278,35 @@
 /* 5 */
 /***/ function(module, exports) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {var state = {
-	    warriors: {
+	/* WEBPACK VAR INJECTION */(function(global) {function State() {
+	    this.warriors = {
 	        white: [], // array of pointers to Warrior instances with white color
 	        black: [] // array of pointers to Warrior instances with black color
 	    },
-	    rmWarrior: function(warrior) {
-	        var index = this.warriors[warrior.color].indexOf(warrior);
-	        this.warriors[warrior.color].splice(index);
-	    },
-	    king: null, // pointer to King Warrior
-	    activeWarrior: null, // pointer to active Warrior — clicked and ready to move
-	    changeActiveWarrior: function(warrior) {
-	        this.activeWarrior = warrior;
-	        this.board.changeActiveCell(warrior && warrior.cell);
-	    },
-	    board: null,
-	    socket: null, // {socket.io} current client's socket @TODO: so bad to store socket in state
-	    color: null, // {String} current client's color @TODO: same here
-	    ai: null, // {Function} init fn of Artifical Intelligence
-	    moves: [],
-	    turn: 'black' // Black starts
+	    this.king = null, // pointer to King Warrior
+	    this.activeWarrior = null, // pointer to active Warrior — clicked and ready to move
+	    
+	    this.board = null,
+	    this.socket = null, // {socket.io} current client's socket @TODO: so bad to store socket in state
+	    this.color = null, // {String} current client's color @TODO: same here
+	    this.ai = null, // {Function} init fn of Artifical Intelligence
+	    this.moves = [],
+	    this.turn = 'black' // Black starts
+	}
+	State.prototype.removeWarrior = function(warrior) {
+	    var index = this.warriors[warrior.color].indexOf(warrior);
+	    this.warriors[warrior.color].splice(index);
+	};
+	State.prototype.changeActiveWarrior = function(warrior) {
+	    this.activeWarrior = warrior;
+	    this.board.changeActiveCell(warrior && warrior.cell);
 	};
 
-	global.state = state;
-	module.exports = state;
+	global.state = new State();
+	module.exports = {
+	    State: State,
+	    state: global.state
+	}
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
@@ -10306,7 +10315,7 @@
 
 	var hasUI = typeof window != 'undefined';
 	var $ = __webpack_require__(1);
-	var state = __webpack_require__(5);
+	var state = __webpack_require__(5).state;
 	var directions = __webpack_require__(7);
 	var eat = __webpack_require__(8);
 
@@ -10336,7 +10345,7 @@
 	 * @param {Cell} from
 	 * @param {Cell} to
 	 * @param {String} direction
-	 * @param {Boolean} recievedMove — флаг говорит о том, что мы не приняли этот ход от оппонента
+	 * @param {Boolean} recievedMove — opponent's move came from internet and shouldn't be send
 	 */
 	function move(from, to, direction, recievedMove) {
 	    var moveRec = recordMove(from, to);
@@ -10429,7 +10438,7 @@
 	    return true;
 	}
 
-	function tryToMove(from, to) {
+	function tryToMove(from, to, recievedMove) {
 	    if (state.turn === state.color && // check if it is current client's turn
 	        from.warrior.color === state.turn && // check if it is warrior's turn
 	        (!to.type || from.warrior.isKing) && !to.warrior &&
@@ -10437,7 +10446,7 @@
 
 	        var direction = directions.get(from, to);
 	        if (isPathFree(from, to, direction)) {
-	            move(from, to, direction);
+	            move(from, to, direction, recievedMove);
 	        }
 	    }
 	}
@@ -10548,7 +10557,7 @@
 	}
 
 	function killWarriorAt(cell) {
-	    state.rmWarrior(cell.warrior);
+	    state.removeWarrior(cell.warrior);
 	    cell.warrior.die();
 	    cell.warrior = null;
 	}
@@ -10614,12 +10623,16 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var $ = __webpack_require__(1);
-	var state = __webpack_require__(5);
+	var state = __webpack_require__(5).state;
 
 	function Warrior(color, isKing) {
 	    this.cell = null;
 	    this.color = color;
 	    this.isKing = isKing || false;
+
+	    if (!isKing) {
+	        state.warriors[color].push( this );
+	    }
 	}
 	Warrior.prototype.generateUI = function(first_argument) {
 	    var self = this;

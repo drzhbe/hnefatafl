@@ -1,6 +1,6 @@
 var hasUI = typeof window != 'undefined';
 var $ = require('jquery');
-var state = require('./state');
+var state = require('./state').state;
 var directions = require('./directions');
 var eat = require('./eat');
 
@@ -30,7 +30,7 @@ function sendMove(move) {
  * @param {Cell} from
  * @param {Cell} to
  * @param {String} direction
- * @param {Boolean} recievedMove — флаг говорит о том, что мы не приняли этот ход от оппонента
+ * @param {Boolean} recievedMove — opponent's move came from internet and shouldn't be send
  */
 function move(from, to, direction, recievedMove) {
     var moveRec = recordMove(from, to);
@@ -123,7 +123,7 @@ function isPathFree(from, to, direction) {
     return true;
 }
 
-function tryToMove(from, to) {
+function tryToMove(from, to, recievedMove) {
     if (state.turn === state.color && // check if it is current client's turn
         from.warrior.color === state.turn && // check if it is warrior's turn
         (!to.type || from.warrior.isKing) && !to.warrior &&
@@ -131,7 +131,7 @@ function tryToMove(from, to) {
 
         var direction = directions.get(from, to);
         if (isPathFree(from, to, direction)) {
-            move(from, to, direction);
+            move(from, to, direction, recievedMove);
         }
     }
 }

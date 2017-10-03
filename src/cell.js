@@ -1,7 +1,8 @@
 var $ = require('jquery');
-var state = require('./state');
+var state = require('./state').state;
 var move = require('./move');
 var directions = require('./directions');
+var Warrior = require('./warrior');
 
 /**
  * @param {Number} x
@@ -74,6 +75,84 @@ Cell.prototype.markDirection = function(direction) {
         }
         nextCell.mark(true);
         nextCell = nextCell[direction]();
+    }
+};
+
+Cell.prototype.addWarriorHnefatafl = function(boardSize) {
+    var lastIndex = boardSize - 1;
+    var centerIndex = boardSize >> 1; // divide by 2 and floor
+    var x = this.x;
+    var y = this.y;
+    var warrior;
+
+    // Place black Warriors
+    if ((y == 0 || y == lastIndex) && 
+        (x > 2 && x < lastIndex - 2)) {
+
+        warrior = new Warrior('black');
+    } else if ((x == 0 || x == lastIndex) &&
+        (y > 2 && y < lastIndex - 2)) {
+
+        warrior = new Warrior('black');
+    } else if (x == centerIndex && (y == 1 || y == lastIndex - 1)) {
+        warrior = new Warrior('black');
+    } else if (y == centerIndex && (x == 1 || x == lastIndex - 1)) {
+        warrior = new Warrior('black');
+    }
+
+    // @TODO: following conditions should else if
+
+    // Place the King and white Warriors
+    /*
+            x
+          x x x
+        x x o x x
+          x x x
+            x
+    */
+    if (x == centerIndex &&
+        y == centerIndex) {
+
+        warrior = new Warrior('white', true);
+        state.king = warrior;
+    /*
+            x
+          x x x
+        o o x o o
+          x x x
+            x
+    */
+    } else if (x == centerIndex &&
+        (y > centerIndex - 3 && y < centerIndex + 3)) {
+
+        warrior = new Warrior('white');
+    /*
+            o
+          x o x
+        x x x x x
+          x o x
+            o
+    */
+    } else if (y == centerIndex &&
+        (x > centerIndex - 3 && x < centerIndex + 3)) {
+
+        warrior = new Warrior('white');
+    /*
+            x
+          o x o
+        x x x x x
+          o x o
+            x
+    */
+    } else if ((x == centerIndex - 1 || x == centerIndex + 1) &&
+        (y == centerIndex - 1 || y == centerIndex + 1)) {
+
+        warrior = new Warrior('white');
+    }
+
+    if (warrior) {
+        warrior.cell = this;
+        this.warrior = warrior;
     }
 };
 
