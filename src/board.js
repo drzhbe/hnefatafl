@@ -1,12 +1,22 @@
 var $ = require('jquery');
 var Cell = require('./cell');
-var Warrior = require('./warrior');
-var state = require('./state').state;
-
-function Board(size) {
+var addWarrior = require('./rules');
+/**
+ * @param {State} appState
+ * @param {Number} size of board, typically it's 11
+ * @param {String} ruleSet
+ *                 0 default hnefatafl game
+ *                 1 rules board: goal
+ *                 2 rules board: move
+ *                 3 rules board: eat
+ *                 4 rules board: throne and corners
+ */
+function Board(appState, size, ruleSet) {
+    this.appState = appState;
     this.size = size;
     this.cells = []; // array of N=size arrays, each containing N cells
     this.element = null; // {Null|jQuery}
+    this.ruleSet = ruleSet;
 }
 /**
  * Generate UI and bind events for:
@@ -15,35 +25,31 @@ function Board(size) {
  * - all Warriors
  * So board generation with UI goes in 2 full for-loops.
  */
-Board.prototype.generateUI = function() {
+Board.prototype.generateUI = function(boardWrapper) {
     var size = this.size;
     
-    this.element = $('<div>').addClass('board');
+    this.element = $('<div>').addClass('board _' + this.appState.color);
+    if (this.appState.color === this.appState.turn) {
+        this.element.addClass('_turn');
+    }
     
     for (var x = 0; x < size; x++) {
         var cellX = this.cells[x];
-        cellX.element = $('<div>').addClass('board__line');
-        this.element.append( cellX.element );
         for (var y = 0; y < size; y++) {
-            cellX[y].generateUI();
-            cellX.element.append( cellX[y].element );
+            cellX[y].generateUI(this.element);
             if (cellX[y].warrior) {
-                cellX[y].warrior.generateUI();
-                cellX[y].element.append( cellX[y].warrior.element );
+                cellX[y].warrior.generateUI(cellX[y].element);
             }
         }
     }
 
-    var boardWrapper = $('.boardWrapper');
-    if (!boardWrapper.length) {
-        boardWrapper = $(document.body);
-    }
     boardWrapper.append(this.element);
 };
+
 /**
- * @param {Boolean} hasUI — whether we should generate UI or not
+ * @param {DOMElement} boardWrapper
  */
-Board.prototype.generate = function(hasUI) {
+Board.prototype.generate = function(boardWrapper) {
     var size = this.size;
 
     for (var x = 0; x < size; x++) {
@@ -53,8 +59,8 @@ Board.prototype.generate = function(hasUI) {
         }
     }
 
-    if (hasUI) {
-        this.generateUI();
+    if (boardWrapper) {
+        this.generateUI(boardWrapper);
     }
 
     return this;
@@ -80,10 +86,10 @@ Board.prototype.addCell = function(x, y) {
         cellType = 'throne';
     }
 
-    var cell = new Cell(x, y, cellType);
+    var cell = new Cell(this.appState, this, x, y, cellType);
     this.cells[x].push( cell );
 
-    cell.addWarriorHnefatafl(size);
+    addWarrior[this.ruleSet](cell, size);
 
     return cell;
 };
@@ -99,5 +105,21 @@ Board.prototype.changeActiveCell = function(activeCell) {
         activeCell.markPossibleMoves();
     }
 };
+Board.prototype.remove = function() {
+    this.element.remove();
+    this.element = null;
+    this.cells.forEach(function(row) {
+        row.forEach(function(cell) {
+            cell.remove();
+        });
+    });
+    this.cells = null;
+    this.appState.warriors.black = [];
+    this.appState.warriors.white = [];
+    this.appState.king = null;
+    this.ruleSet = null;
+    this.appState = null;
+};
+
 
 module.exports = Board;

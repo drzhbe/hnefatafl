@@ -1,15 +1,17 @@
 var $ = require('jquery');
-var state = require('./state').state;
 var move = require('./move');
 var directions = require('./directions');
-var Warrior = require('./warrior');
 
 /**
+ * @param {State} appState
+ * @param {Board} board
  * @param {Number} x
  * @param {Number} y
  * @param {String|Undefined} type ['corner'|'throne']
  */
-function Cell(x, y, type) {
+function Cell(appState, board, x, y, type) {
+    this.appState = appState;
+    this.board = board;
     this.x = x;
     this.y = y;
     this.type = type;
@@ -19,41 +21,43 @@ function Cell(x, y, type) {
 Cell.prototype.size = 50;
 
 
-Cell.prototype.generateUI = function() {
+Cell.prototype.generateUI = function(parent) {
     var self = this;
     this.element = $('<div>').addClass('board__cell');
+    this.element.css({left: this.x * this.size, top: this.y * this.size});
     if (this.type) {
         this.element.addClass('_' + this.type);
     }
     this.element.append($('<div>').addClass('board__cell_moveMarker'));
     this.element.on('click', function() {
-        if (state.activeWarrior) {
-            move.tryToMove(state.activeWarrior.cell, self);
-        }
+        move.tryToMoveActiveWarrior(self.appState, self);
     });
+    if (parent) {
+        parent.append(this.element);
+    }
 };
 Cell.prototype.top = function() {
     var topY = this.y - 1;
     if (topY >= 0) {
-        return state.board.cells[this.x][topY];
+        return this.board.cells[this.x][topY];
     }
 };
 Cell.prototype.bottom = function() {
     var bottomY = this.y + 1;
-    if (bottomY < state.board.size) {
-        return state.board.cells[this.x][bottomY];
+    if (bottomY < this.board.size) {
+        return this.board.cells[this.x][bottomY];
     }
 };
 Cell.prototype.left = function() {
     var leftX = this.x - 1;
     if (leftX >= 0) {
-        return state.board.cells[leftX][this.y];
+        return this.board.cells[leftX][this.y];
     }
 };
 Cell.prototype.right = function() {
     var rightX = this.x + 1;
-    if (rightX < state.board.size) {
-        return state.board.cells[rightX][this.y];
+    if (rightX < this.board.size) {
+        return this.board.cells[rightX][this.y];
     }
 };
 Cell.prototype.mark = function(enable) {
@@ -70,90 +74,26 @@ Cell.prototype.markPossibleMoves = function() {
 Cell.prototype.markDirection = function(direction) {
     var nextCell = this[direction]();
     while (nextCell) {
-        if (nextCell.warrior || nextCell.type == 'corner') {
+        if (nextCell.warrior
+            || (nextCell.type === 'corner' && !this.appState.activeWarrior.isKing))
+        {
             return;
         }
-        nextCell.mark(true);
+        if (!(nextCell.type === 'throne' && !this.appState.activeWarrior.isKing)) {
+            nextCell.mark(true);
+        }
         nextCell = nextCell[direction]();
     }
 };
-
-Cell.prototype.addWarriorHnefatafl = function(boardSize) {
-    var lastIndex = boardSize - 1;
-    var centerIndex = boardSize >> 1; // divide by 2 and floor
-    var x = this.x;
-    var y = this.y;
-    var warrior;
-
-    // Place black Warriors
-    if ((y == 0 || y == lastIndex) && 
-        (x > 2 && x < lastIndex - 2)) {
-
-        warrior = new Warrior('black');
-    } else if ((x == 0 || x == lastIndex) &&
-        (y > 2 && y < lastIndex - 2)) {
-
-        warrior = new Warrior('black');
-    } else if (x == centerIndex && (y == 1 || y == lastIndex - 1)) {
-        warrior = new Warrior('black');
-    } else if (y == centerIndex && (x == 1 || x == lastIndex - 1)) {
-        warrior = new Warrior('black');
+Cell.prototype.remove = function() {
+    this.element.remove();
+    this.element = null;
+    if (this.warrior) {
+        this.warrior.die();
+        this.warrior = null;
     }
-
-    // @TODO: following conditions should else if
-
-    // Place the King and white Warriors
-    /*
-            x
-          x x x
-        x x o x x
-          x x x
-            x
-    */
-    if (x == centerIndex &&
-        y == centerIndex) {
-
-        warrior = new Warrior('white', true);
-        state.king = warrior;
-    /*
-            x
-          x x x
-        o o x o o
-          x x x
-            x
-    */
-    } else if (x == centerIndex &&
-        (y > centerIndex - 3 && y < centerIndex + 3)) {
-
-        warrior = new Warrior('white');
-    /*
-            o
-          x o x
-        x x x x x
-          x o x
-            o
-    */
-    } else if (y == centerIndex &&
-        (x > centerIndex - 3 && x < centerIndex + 3)) {
-
-        warrior = new Warrior('white');
-    /*
-            x
-          o x o
-        x x x x x
-          o x o
-            x
-    */
-    } else if ((x == centerIndex - 1 || x == centerIndex + 1) &&
-        (y == centerIndex - 1 || y == centerIndex + 1)) {
-
-        warrior = new Warrior('white');
-    }
-
-    if (warrior) {
-        warrior.cell = this;
-        this.warrior = warrior;
-    }
+    this.board = null;
+    this.appState = null;
 };
 
 module.exports = Cell;

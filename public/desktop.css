@@ -33,6 +33,17 @@ body._intro {
         stroke-dashoffset: 500;
     }
 }
+@keyframes blink {
+    0% {
+        opacity: 0;
+    }
+    75% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
 
 
 .info {
@@ -44,6 +55,48 @@ body._intro {
     position: relative;
     top: 14px;
 }
+.info__book {
+    position: relative;
+    margin: 10px auto;
+    width: 100px;
+    height: 100px;
+}
+.info__book-bg {
+    border-radius: 100px;
+    width: 100px;
+    height: 100px;
+    background: #000;
+}
+.info__book-img {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    background: url('img/book.svg');
+    background-size: cover;
+    width: 80px;
+    height: 80px;
+    transition: all 100ms;
+    cursor: pointer;
+}
+.info__book-img:hover {
+    transform: scale(1.1, 1.1);
+}
+.info__book._open .info__book-img {
+    transform: translate(-1px, -5px);
+    background: url('img/book-open.svg');
+    background-size: cover;
+}
+.info__book._open .info__book-img:hover {
+    transform: scale(1.1, 1.1) translate(-1px, -5px);
+}
+.info__book-bg {
+    display: none;
+}
+.info__book._open .info__book-bg {
+    display: block;
+    animation: blink 5s infinite alternate cubic-bezier(0.755, 0.05, 0.855, 0.06);
+}
+
 .info__brief {
     display: none;
     width: 480px;
@@ -75,10 +128,17 @@ body._intro {
     justify-content: center;
 }
 
+.boardWrapper {
+    position: relative;
+    width: 550px;
+    height: 550px;
+    margin: 0 auto;
+}
 .board {
     display: flex;
 }
 .board__cell {
+    position: absolute;
     width: 50px;
     height: 50px;
     border: 1px solid #555;
@@ -86,7 +146,6 @@ body._intro {
     justify-content: center;
     align-items: center;
     background: #eee;
-    perspective: 30px;
 }
 .board__cell._corner {
     background: #999;
@@ -106,13 +165,185 @@ body._intro {
     display: none;
 }
 
+.book-wrapper {
+    pointer-events: none;
+    position: absolute;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+.book {
+    pointer-events: all;
+    position: relative;
+    transform: translateY(-101%);
+    width: 100%;
+    /*height: 100%;*/
+    background: #fff;
+    transition: all 0.5s;
+}
+.book._shown {
+    transform: translateY(0);
+}
+.book__closeButton {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 40px;
+    height: 40px;
+    background: #fff;
+    border: 2px solid;
+    border-radius: 40px;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+.book__closeButton::before {
+    content: 'x';
+    line-height: 36px;
+    font-size: 32px;
+}
+
+
+.book__page {
+    position: absolute;
+    width: 560px;
+    top: -10px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    pointer-events: none;
+    transition: all 200ms;
+}
+.book__page._hovered {
+    transform: translate(-50%, 5px);
+}
+.book__page._active {
+    z-index: 1;
+}
+.book__page._capture {
+    left: 51%;
+}
+.book__page._king {
+    left: 52%;
+}
+.book__page._goal {
+    left: 53%;
+}
+
+
+/* TODO: after finalizing svg's use single class instead of id's */
+.rules-page-bg {
+    fill: #fff;
+}
+.rules-page-crown {
+    fill: #f2c94c;
+}
+#move-area {
+    pointer-events: all;
+}
+#move-area:hover {
+    cursor: pointer;
+}
+#capture-area {
+    pointer-events: all;
+}
+#capture-area:hover {
+    cursor: pointer;
+}
+#king-area {
+    pointer-events: all;
+}
+#king-area:hover {
+    cursor: pointer;
+}
+#goal-area {
+    pointer-events: all;
+}
+#goal-area:hover {
+    cursor: pointer;
+}
+
+
+
+
+.page__info {
+    position: absolute;
+    width: 550px;
+    top: 25%;
+    left: 50%;
+    /*background: #fff;
+    border: 2px solid;
+    border-radius: 100px;*/
+    padding: 20px 30px;
+    transform: translate(-50%, -50%);
+}
+.page__info-viking {
+    float: right;
+    background: url('img/tafl-viking.svg');
+    background-size: cover;
+    width: 150px;
+    height: 215px;
+    display: inline-block;
+    margin-right: 60px;
+}
+
+/* Page talk bubbles */
+.talk-bubble {
+    display: inline-block;
+    position: relative;
+    float: right;
+    top: 80px;
+    margin-right: 20px;
+    width: 200px;
+    height: auto;
+    background-color: #fff;
+    border: 8px solid #666;
+    border-radius: 30px;
+    -webkit-border-radius: 30px;
+    -moz-border-radius: 30px;
+}
+.talk-bubble:before {
+    content: ' ';
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: auto;
+    right: -40px;
+    top: 30px;
+    bottom: auto;
+    border: 20px solid;
+    border-color: #666 transparent transparent #666;
+}
+.talk-bubble:after{
+    content: ' ';
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: auto;
+    right: -20px;
+    top: 38px;
+    bottom: auto;
+    border: 12px solid;
+    border-color: #fff transparent transparent #fff;
+}
+.talktext{
+    padding: 1em;
+    text-align: left;
+    line-height: 1.5em;
+    font-family: "Ubuntu-Italic", "Lucida Sans", helvetica, sans;
+}
+.talktext p{
+    -webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
+}
+
 
 .warrior {
     width: 40px;
     height: 40px;
     border-radius: 30px;
 }
-.warrior:hover {
+.board._turn._black .warrior._black:hover,
+.board._turn._white .warrior._white:hover {
     transform: scale(1.1,1.1);
     box-shadow: 0px 0px 20px #777;
 }

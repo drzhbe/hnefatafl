@@ -6,6 +6,7 @@ var disconnectedPlayers = {};
 var io = require('socket.io')();
 io.on('connection', function(socket) {
     usersCount++;
+    console.log('+', socket.id, usersCount, playingUsersCount)
     io.emit('usersCountChanged', usersCount);
     io.to(socket.id).emit('connected', socket.id);
 
@@ -21,6 +22,8 @@ io.on('connection', function(socket) {
         } else {
             io.to(socket.id).emit('setColor', 'black');
         }
+
+        console.log('$', socket.id, usersCount, playingUsersCount, lastRoom, playersToRooms, io.sockets.adapter.rooms)
     });
 
     socket.on('move', function(move) {
@@ -32,8 +35,14 @@ io.on('connection', function(socket) {
     });
 
     socket.on('disconnect', function() {
+        
         usersCount--;
-        playingUsersCount--;
+        // Last room would be more than player's room if the pair connected and game started
+        if (playersToRooms[socket.id] < lastRoom) {
+            playingUsersCount--;
+        }
+        delete playersToRooms[socket.id];
+        console.log('-', socket.id, usersCount, playingUsersCount, lastRoom, playersToRooms, io.sockets.adapter.rooms)
         io.emit('usersCountChanged', usersCount);
         // io.to(playersToRooms[socket.id]).emit('endGame', {reason: 'opponentDisconnected', loserId: socket.id});
     });

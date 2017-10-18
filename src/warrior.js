@@ -1,16 +1,22 @@
 var $ = require('jquery');
-var state = require('./state').state;
 
-function Warrior(color, isKing) {
+/*
+    @param {State} appState
+    @param {String} color ['black'|'white'|'king']
+ */
+function Warrior(appState, color) {
+    this.appState = appState;
     this.cell = null;
-    this.color = color;
-    this.isKing = isKing || false;
+    this.isKing = color === 'king';
+    this.color = this.isKing ? 'white' : color;
 
-    if (!isKing) {
-        state.warriors[color].push( this );
+    if (this.isKing) {
+        this.appState.king = this;
+    } else {
+        this.appState.warriors[color].push( this );
     }
 }
-Warrior.prototype.generateUI = function(first_argument) {
+Warrior.prototype.generateUI = function(parent) {
     var self = this;
     this.element = $('<div>')
         .addClass('warrior')
@@ -22,19 +28,16 @@ Warrior.prototype.generateUI = function(first_argument) {
     this.element.on('click', function(e) {
         // check if it is turn of current client (socket)
         // check if it is turn of current warrior -___-
-        if (state.turn == state.color && state.turn == self.color) {
-            if (state.activeWarrior) {
-                state.activeWarrior.element.removeClass('_active');
-            }
-            if (state.activeWarrior === self) {
-                state.changeActiveWarrior(null);
-            } else {
-                state.changeActiveWarrior(self);
-                self.element.addClass('_active');
-            }
+        if (self.appState.turn == self.appState.color &&
+            self.appState.turn == self.color)
+        {
+            self.appState.changeActiveWarrior(self);
         }
         e.stopPropagation(); // dont propagate on Cell if it is a Warrior here
     });
+    if (parent) {
+        parent.append(this.element);
+    }
 };
 Warrior.prototype.move = function(cell) {
     this.cell.warrior = null;
@@ -44,6 +47,8 @@ Warrior.prototype.move = function(cell) {
 Warrior.prototype.die = function() {
     this.element.remove();
     this.element = null;
+    this.cell = null;
+    this.appState = null;
 };
 
 module.exports = Warrior;

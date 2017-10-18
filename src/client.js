@@ -4,9 +4,10 @@ if (hasUI) {
     var $actionsPlay = $('.actions__play');
 }
 var game = require('./game');
-var directions = require('./directions');
 var movement = require('./move');
-var state = require('./state').state;
+var State = require('./State');
+var Book = require('./Book');
+var io = require('socket.io-client');
 
 if (hasUI) {
     amplitude.getInstance().logEvent('INTRO_STARTED');
@@ -14,7 +15,8 @@ if (hasUI) {
         $(this).hide();
         $('.intro').hide();
         $('body').removeClass('_intro');
-        connect('https://tafl.website');
+        connect();
+        // connect('https://tafl.website');
         amplitude.getInstance().logEvent('PLAY_CLICKED');
     });
     $serverPopulation = $('.info__serverPopulation');
@@ -27,12 +29,14 @@ if (hasUI) {
         $('#play-svg-blur').show();
         stroke.attr('fill', '#000')
     });
+
+    // Create rules book
+    global.book = new Book();
 }
 /**
  * @param {String} server — w/ or w/o scheme and w/ port ('http://localhost:3000')
  */
 function connect(server) {
-    console.log('\n\nserver', typeof server, server, '\n\n');
     if (server) {
         if (server.indexOf('http') == -1) {
             server = 'http://' + server;
@@ -40,17 +44,30 @@ function connect(server) {
     } else {
         server = 'http://localhost:3030';
     }
-    state.server = server;
-    var socket = require('socket.io-client')(server, {path: '/server/socket.io'});
+
+    var socket = io(server, {path: '/server/socket.io'});
+    var appState = new State();
+    appState.server = server;
+    appState.socket = socket;
+
     socket.on('connect', function() {
+        console.log(socket.id)
+
+        if (appState.board) {
+            appState.board.remove();
+            appState = new State();
+            appState.server = server;
+            appState.socket = socket;
+        }
+
         socket.on('connected', function(socketId) {
-            console.log('\n\nsocketId', typeof socketId, socketId, '\n\n');
+            console.log(socketId)
         });
         socket.on('setColor', function(color) {
             // If color exists it means we already in game and it is just a reconnect.
-            if (state.color) return;
+            if (appState.color) return;
 
-            state.color = color;
+            appState.color = color;
             if (hasUI) {
                 var $info = $('.info');
                 var $brief = $info.find('.info__brief');
@@ -77,12 +94,8 @@ function connect(server) {
         socket.on('start', function(data) {
             console.log('Recieved `start` signal from socket')
 
-            // If board exists it means we already in game and it is just a reconnect.
-            if (state.board) return;
-
-            state.socket = socket;
             // create game
-            game(state);
+            game(appState);
 
             $('.info__brief').show();
             $('.info__turn').show();
@@ -94,10 +107,10 @@ function connect(server) {
         socket.on('moveDone', function(move) {
             console.log(typeof move, 'move', move);
             // if opponent's move done
-            if (state.color != move.color) {
-                var from = state.board.cells[move.x1][move.y1];
-                var to = state.board.cells[move.x2][move.y2];
-                movement.tryToMove(from, to, true);
+            if (appState.color != move.color) {
+                var from = appState.board.cells[move.x1][move.y1];
+                var to = appState.board.cells[move.x2][move.y2];
+                movement.tryToMove(appState, from, to, true);
             }
             // @TODO: send moveData on move and recieve moveData on enemyMove
         });

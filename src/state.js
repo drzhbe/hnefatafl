@@ -15,15 +15,24 @@ function State() {
 }
 State.prototype.removeWarrior = function(warrior) {
     var index = this.warriors[warrior.color].indexOf(warrior);
-    this.warriors[warrior.color].splice(index);
+    this.warriors[warrior.color].splice(index, 1);
 };
 State.prototype.changeActiveWarrior = function(warrior) {
-    this.activeWarrior = warrior;
-    this.board.changeActiveCell(warrior && warrior.cell);
+    var state = this;
+
+    if (state.activeWarrior) {
+        state.activeWarrior.element.removeClass('_active');
+    }
+    if (state.activeWarrior === warrior || !warrior) {
+        state.activeWarrior = null;
+    } else {
+        state.activeWarrior = warrior;
+        warrior.element.addClass('_active');
+    }
+
+    // call change of board if warrior was activated or deactivated
+    var activeCell = state.activeWarrior && state.activeWarrior.cell;
+    state.board.changeActiveCell(activeCell);
 };
 
-global.state = new State();
-module.exports = {
-    State: State,
-    state: global.state
-}
+module.exports = State;
